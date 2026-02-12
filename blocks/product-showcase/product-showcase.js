@@ -145,10 +145,13 @@ function createProductCard(product, index, bridge) {
   tellMore.className = 'showcase-cta';
   tellMore.textContent = 'Tell me more';
   tellMore.addEventListener('click', () => {
+    // eslint-disable-next-line no-console
+    console.log('[ProductShowcase] Tell me more clicked, isConnected:', bridge.isConnected);
     if (bridge.isConnected) {
       bridge.sendMessage(`Tell me more about "${product.name}".`);
-    } else if (product.url) {
-      window.open(product.url, '_blank');
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn('[ProductShowcase] Bridge not connected — sendMessage skipped');
     }
   });
   actions.appendChild(tellMore);
@@ -160,10 +163,15 @@ function createProductCard(product, index, bridge) {
   findSimilar.className = 'showcase-cta showcase-cta-secondary';
   findSimilar.textContent = 'Find similar';
   findSimilar.addEventListener('click', () => {
+    // eslint-disable-next-line no-console
+    console.log('[ProductShowcase] Find similar clicked, isConnected:', bridge.isConnected);
     if (bridge.isConnected) {
       bridge.sendMessage(
         `Find me products similar to "${product.name}" in the ${product.price != null ? `$${product.price}` : 'same'} price range.`,
       );
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn('[ProductShowcase] Bridge not connected — sendMessage skipped');
     }
   });
   actions.appendChild(findSimilar);
