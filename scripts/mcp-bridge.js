@@ -61,11 +61,6 @@ export class MCPBridge {
     this.toolInput = new Promise((resolve) => {
       this._toolInputResolve = resolve;
     });
-
-    // Locale (standard: document.documentElement.lang)
-    this._locale = typeof document !== 'undefined'
-      ? document.documentElement.lang || 'en'
-      : 'en';
   }
 
   // ---------------------------------------------------------------
@@ -80,11 +75,6 @@ export class MCPBridge {
   /** Whether the ui/initialize handshake has completed. */
   get isConnected() {
     return this._connected;
-  }
-
-  /** Current locale (from document.documentElement.lang). */
-  get locale() {
-    return this._locale;
   }
 
   // ---------------------------------------------------------------
