@@ -16,7 +16,7 @@
  *   ui/notifications/tool-result   → bridge.toolResult   (Promise)
  *   ui/notifications/tool-input    → bridge.toolInput    (Promise)
  *   tools/call                     → bridge.callTool(name, args)
- *   ui/message                     → bridge.sendMessage(text)
+ *   ui/message                     → bridge.sendMessage(text)  (Request)
  *   ui/update-model-context        → bridge.updateModelContext(text)
  *
  * @example
@@ -147,11 +147,11 @@ export class MCPBridge {
   /**
    * Post a follow-up message in the conversation.
    * @param {string} text - Message text
-   * @param {string} [role='user'] - Message role
+   * @returns {Promise<Object>} Host response
    */
-  sendMessage(text, role = 'user') {
-    this.notify('ui/message', {
-      role,
+  async sendMessage(text) {
+    return this.request('ui/message', {
+      role: 'user',
       content: [{ type: 'text', text }],
     });
   }
