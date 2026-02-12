@@ -1,0 +1,40 @@
+.quote blockquote {
+  margin: 0;
+  padding: 24px 32px;
+  border-left: 4px solid var(--link-color, #035fe6);
+  background-color: var(--light-color, #f8f8f8);
+  border-radius: 0 8px 8px 0;
+}
+
+.quote blockquote p {
+  font-size: var(--body-font-size-l, 1.25rem);
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0 0 8px;
+  color: var(--text-color, #202020);
+}
+
+.quote blockquote cite {
+  display: block;
+  font-size: var(--body-font-size-s, 0.875rem);
+  font-style: normal;
+  font-weight: 700;
+  color: var(--dark-color, #136ff6);
+  margin-top: 12px;
+}
+
+.quote blockquote cite::before {
+  content: '— ';
+}
+
+/* Variant: .quote.highlight */
+.quote.highlight blockquote {
+  border-left-color: var(--dark-color, #136ff6);
+  background-color: #eef5ff;
+}
+
+@media (min-width: 900px) {
+  .quote blockquote {
+    padding: 32px 48px;
+  }
+}
