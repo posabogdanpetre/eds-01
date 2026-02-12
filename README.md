@@ -1,5 +1,5 @@
 # Your Project's Title...
-Your project's description...
+My personal EDS project for embedding it in LLM APPS
 
 ## Environments
 - Preview: https://main--{repo}--{owner}.aem.page/
