@@ -149,4 +149,4 @@ async function loadPage() {
   loadDelayed();
 }
 
-loadPage();
+if (!window.hlx.suppressLoadPage) loadPage();
