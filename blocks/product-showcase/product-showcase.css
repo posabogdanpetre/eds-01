@@ -1,0 +1,314 @@
+/* =============================================
+   Product Showcase Block
+   A horizontal card carousel for ChatGPT widgets
+   ============================================= */
+
+/* Theme variables — Light (default) */
+.product-showcase {
+  --ps-bg: transparent;
+  --ps-card-bg: #fff;
+  --ps-text: #1a1a1a;
+  --ps-text-muted: #666;
+  --ps-accent: #0066ff;
+  --ps-accent-hover: #0052cc;
+  --ps-price: #0066ff;
+  --ps-stars: #f5a623;
+  --ps-card-shadow: rgb(0 0 0 / 6%);
+  --ps-card-shadow-hover: rgb(0 0 0 / 12%);
+  --ps-arrow-bg: #1a1a1a;
+  --ps-arrow-text: #fff;
+  --ps-arrow-hover: #333;
+  --ps-border: #eee;
+
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 16px 50px;
+  position: relative;
+  overflow: visible;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--ps-bg);
+}
+
+/* Dark theme — system preference */
+@media (prefers-color-scheme: dark) {
+  .product-showcase {
+    --ps-card-bg: #2a2a2a;
+    --ps-text: #e8e8e8;
+    --ps-text-muted: #aaa;
+    --ps-accent: #4d9fff;
+    --ps-accent-hover: #3d8df0;
+    --ps-price: #4d9fff;
+    --ps-card-shadow: rgb(0 0 0 / 20%);
+    --ps-card-shadow-hover: rgb(0 0 0 / 40%);
+    --ps-arrow-bg: #e8e8e8;
+    --ps-arrow-text: #1a1a1a;
+    --ps-arrow-hover: #fff;
+    --ps-border: #444;
+  }
+}
+
+/* Dark theme — explicit from ChatGPT host */
+.product-showcase[data-theme="dark"] {
+  --ps-card-bg: #2a2a2a;
+  --ps-text: #e8e8e8;
+  --ps-text-muted: #aaa;
+  --ps-accent: #4d9fff;
+  --ps-accent-hover: #3d8df0;
+  --ps-price: #4d9fff;
+  --ps-card-shadow: rgb(0 0 0 / 20%);
+  --ps-card-shadow-hover: rgb(0 0 0 / 40%);
+  --ps-arrow-bg: #e8e8e8;
+  --ps-arrow-text: #1a1a1a;
+  --ps-arrow-hover: #fff;
+  --ps-border: #444;
+}
+
+/* Heading */
+.showcase-heading {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ps-text);
+  margin: 0 0 16px;
+  padding: 0 4px;
+}
+
+/* Carousel container */
+.showcase-container {
+  display: flex;
+  gap: 20px;
+  overflow: auto visible;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 8px 4px 16px;
+}
+
+.showcase-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card */
+.showcase-card {
+  background: var(--ps-card-bg);
+  border-radius: 12px;
+  min-width: 300px;
+  max-width: 300px;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--ps-card-shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.showcase-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px var(--ps-card-shadow-hover);
+}
+
+/* Card image */
+.showcase-card-image {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.product-showcase[data-theme="dark"] .showcase-card-image {
+  background: #333;
+}
+
+.showcase-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.showcase-card:hover .showcase-card-image img {
+  transform: scale(1.04);
+}
+
+/* Category badge */
+.showcase-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--ps-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Card body */
+.showcase-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.showcase-product-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ps-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Rating */
+.showcase-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.showcase-stars {
+  color: var(--ps-stars);
+  letter-spacing: 1px;
+}
+
+.showcase-rating-value {
+  color: var(--ps-text-muted);
+  font-size: 13px;
+}
+
+/* Description */
+.showcase-description {
+  font-size: 14px;
+  color: var(--ps-text-muted);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+/* Price */
+.showcase-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ps-price);
+  margin: 4px 0 0;
+}
+
+/* CTA link */
+.showcase-cta {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 10px 20px;
+  background: var(--ps-accent);
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  text-align: center;
+  transition: background 0.2s ease;
+}
+
+.showcase-cta:hover {
+  background: var(--ps-accent-hover);
+}
+
+/* Empty state */
+.showcase-empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--ps-text-muted);
+  font-size: 16px;
+}
+
+/* Carousel arrows */
+.showcase-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--ps-arrow-bg);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+  transition: all 0.2s ease;
+  padding: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ps-arrow-text);
+  outline: none;
+}
+
+.showcase-arrow:hover:not(.disabled) {
+  background: var(--ps-arrow-hover);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.showcase-arrow:active:not(.disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.showcase-arrow.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.showcase-arrow-left {
+  left: 10px;
+}
+
+.showcase-arrow-right {
+  right: 10px;
+}
+
+/* Responsive */
+@media (width <= 768px) {
+  .product-showcase {
+    padding: 12px 35px;
+  }
+
+  .showcase-container {
+    gap: 14px;
+  }
+
+  .showcase-card {
+    min-width: 260px;
+    max-width: 260px;
+  }
+
+  .showcase-card-image {
+    height: 160px;
+  }
+
+  .showcase-arrow {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    font-size: 18px;
+  }
+}
+
+/* Transparent background for ChatGPT integration */
+aem-embed body {
+  background-color: transparent;
+}
