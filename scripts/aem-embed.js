@@ -1,13 +1,20 @@
 /*
- * AEM Embed WebComponent — MCP Apps Standard Bridge
- * Include content from one AEM EDS page in any MCP Apps host (ChatGPT, Claude, etc.)
+ * AEM Embed WebComponent — powered by MCPBridge SDK
  *
- * Protocol: JSON-RPC 2.0 over postMessage (ui/* methods)
- * Spec: https://modelcontextprotocol.github.io/ext-apps
- * Ref:  https://developers.openai.com/apps-sdk/reference
+ * Loads AEM EDS content into any MCP Apps host (ChatGPT, Claude, etc.)
+ * and passes an MCPBridge instance to each block for tool data and interaction.
  *
- * No proprietary APIs (window.openai), no CDN SDK dependencies.
+ * Block contract:  export default function decorate(block, bridge) { ... }
+ *   - bridge.toolResult        → Promise<params> (one-shot, first tool result)
+ *   - bridge.onToolResult(cb)  → subscribe to every tool result
+ *   - bridge.onThemeChange(cb) → subscribe to theme (fires immediately + on change)
+ *   - bridge.callTool(name, args) → call another MCP tool from the UI
+ *   - bridge.sendMessage(text) → post a follow-up message
+ *   - bridge.isEmbedded        → true if inside a host iframe
+ *   - bridge.locale            → user locale
  */
+
+import { MCPBridge } from './mcp-bridge.js';
 
 // eslint-disable-next-line import/prefer-default-export
 export class AEMEmbed extends HTMLElement {
@@ -21,122 +28,14 @@ export class AEMEmbed extends HTMLElement {
     window.hlx.suppressLoadPage = true;
     [window.hlx.codeBasePath] = new URL(import.meta.url).pathname.split('/scripts/');
 
-    // ---------------------------------------------------------------
-    // MCP Apps bridge state
-    // ---------------------------------------------------------------
-    this._rpcId = 0;
-    this._pendingRequests = new Map();
-    this._themeCallbacks = [];
-
-    // Whether we are running inside a host iframe (ChatGPT, etc.)
-    this._isEmbedded = window.parent !== window;
-
-    // Promise that resolves when ui/notifications/tool-result arrives
-    this._toolResultResolve = null;
-    this._toolResultPromise = new Promise((resolve) => {
-      this._toolResultResolve = resolve;
-    });
-
-    // Start listening for host messages immediately
-    if (this._isEmbedded) {
-      this._setupMessageListener();
-    }
+    // Create the bridge instance — shared by all blocks in this embed
+    this._bridge = new MCPBridge();
   }
 
   // ---------------------------------------------------------------
-  // JSON-RPC helpers
+  // Block loading — passes the bridge to block decorate()
   // ---------------------------------------------------------------
 
-  /** Send a JSON-RPC notification (no response expected). */
-  _rpcNotify(method, params) {
-    window.parent.postMessage({ jsonrpc: '2.0', method, params }, '*');
-  }
-
-  /** Send a JSON-RPC request and return a Promise for the response. */
-  _rpcRequest(method, params) {
-    return new Promise((resolve, reject) => {
-      // eslint-disable-next-line no-plusplus
-      const id = ++this._rpcId;
-      this._pendingRequests.set(id, { resolve, reject });
-      window.parent.postMessage({ jsonrpc: '2.0', id, method, params }, '*');
-    });
-  }
-
-  // ---------------------------------------------------------------
-  // postMessage listener — handles all host → widget messages
-  // ---------------------------------------------------------------
-
-  _setupMessageListener() {
-    window.addEventListener('message', (event) => {
-      // Only accept messages from the host (parent frame)
-      if (event.source !== window.parent) return;
-
-      const msg = event.data;
-      if (!msg || msg.jsonrpc !== '2.0') return;
-
-      // --- Handle JSON-RPC responses (to our rpcRequest calls) ---
-      if (typeof msg.id === 'number') {
-        const pending = this._pendingRequests.get(msg.id);
-        if (!pending) return;
-        this._pendingRequests.delete(msg.id);
-        if (msg.error) {
-          pending.reject(msg.error);
-        } else {
-          pending.resolve(msg.result);
-        }
-        return;
-      }
-
-      // --- Handle JSON-RPC notifications from the host ---
-      if (typeof msg.method !== 'string') return;
-
-      if (msg.method === 'ui/notifications/tool-result') {
-        // eslint-disable-next-line no-console
-        console.log('[AEM Embed] Received tool-result');
-        if (this._toolResultResolve) {
-          this._toolResultResolve(msg.params);
-          this._toolResultResolve = null;
-        }
-      }
-
-      if (msg.method === 'ui/notifications/tool-input') {
-        // eslint-disable-next-line no-console
-        console.log('[AEM Embed] Received tool-input', msg.params);
-      }
-    }, { passive: true });
-  }
-
-  // ---------------------------------------------------------------
-  // MCP Apps bridge handshake (ui/initialize)
-  // ---------------------------------------------------------------
-
-  async _initializeBridge() {
-    if (!this._isEmbedded) {
-      // eslint-disable-next-line no-console
-      console.log('[AEM Embed] Not in iframe — bridge skipped');
-      return;
-    }
-
-    try {
-      await this._rpcRequest('ui/initialize', {
-        appInfo: { name: 'AEMEmbed', version: '2.0.0' },
-        appCapabilities: {},
-        protocolVersion: '2026-01-26',
-      });
-      this._rpcNotify('ui/notifications/initialized', {});
-      // eslint-disable-next-line no-console
-      console.log('[AEM Embed] MCP Apps bridge initialized');
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('[AEM Embed] Bridge init failed:', err);
-    }
-  }
-
-  // ---------------------------------------------------------------
-  // Block loading — passes tool data & theme to block decorate()
-  // ---------------------------------------------------------------
-
-  // eslint-disable-next-line class-methods-use-this
   async loadBlock(body, block, blockName, origin) {
     const blockCss = `${origin}${window.hlx.codeBasePath}/blocks/${blockName}/${blockName}.css`;
     if (!body.querySelector(`link[href="${blockCss}"]`)) {
@@ -159,27 +58,8 @@ export class AEMEmbed extends HTMLElement {
       // eslint-disable-next-line no-await-in-loop
       const decorateBlock = await import(blockScriptUrl);
       if (decorateBlock.default) {
-        // --- onDataLoaded: resolves with ui/notifications/tool-result params ---
-        const onDataLoaded = this._isEmbedded
-          ? this._toolResultPromise
-          : Promise.resolve({ structuredContent: {} }); // Fallback for standalone testing
-
-        // --- onThemeChanged: query param override or default ---
-        const onThemeChanged = (callback) => {
-          const urlParams = new URLSearchParams(window.location.search);
-          const themeParam = urlParams.get('theme');
-
-          // Apply initial theme
-          callback(themeParam || 'light');
-
-          // Track callback for future theme updates
-          if (!themeParam) {
-            this._themeCallbacks.push(callback);
-          }
-        };
-
         // eslint-disable-next-line no-await-in-loop
-        await decorateBlock.default(block, onDataLoaded, onThemeChanged);
+        await decorateBlock.default(block, this._bridge);
       }
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -188,7 +68,7 @@ export class AEMEmbed extends HTMLElement {
   }
 
   // ---------------------------------------------------------------
-  // Content handlers (header, footer, main)
+  // Content handlers
   // ---------------------------------------------------------------
 
   async handleHeader(htmlText, body, origin) {
@@ -210,7 +90,6 @@ export class AEMEmbed extends HTMLElement {
     await this.loadBlock(body, block, 'header', origin);
 
     block.dataset.blockStatus = 'loaded';
-
     body.style.height = 'var(--nav-height)';
     body.classList.add('appear');
   }
@@ -247,7 +126,6 @@ export class AEMEmbed extends HTMLElement {
       await decorateMain(main, true);
     }
 
-    // Query all the blocks in the aem content
     const blockElements = main.querySelectorAll('.block');
 
     if (blockElements.length > 0) {
@@ -296,7 +174,7 @@ export class AEMEmbed extends HTMLElement {
         const { href, origin } = new URL(plainUrl);
 
         // Start bridge handshake in parallel with content fetch
-        const bridgeReady = this._initializeBridge();
+        const bridgeReady = this._bridge.connect();
 
         // Load fragment
         const resp = await fetch(href);
@@ -312,13 +190,12 @@ export class AEMEmbed extends HTMLElement {
         this.shadowRoot.appendChild(styles);
 
         let htmlText = await resp.text();
-        // Fix relative image urls
         const regex = /.\/media/g;
         htmlText = htmlText.replace(regex, `${origin}/media`);
 
         this.initialized = true;
 
-        // Wait for bridge handshake to complete before loading blocks
+        // Wait for bridge before loading blocks
         await bridgeReady;
 
         if (type === 'main') await this.handleMain(htmlText, body, origin);
@@ -345,7 +222,6 @@ export class AEMEmbed extends HTMLElement {
       script.type = 'module';
       script.onload = resolve;
       script.onerror = reject;
-
       document.body.appendChild(script);
     });
   }

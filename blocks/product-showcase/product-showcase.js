@@ -1,27 +1,22 @@
 /**
- * Product Showcase Block
+ * Product Showcase Block — uses MCPBridge SDK
  *
  * Displays a horizontal carousel of product cards.
- * Designed to be used with aem-embed.js inside ChatGPT / MCP Apps widgets.
+ * Receives data and interacts with the host via the bridge.
  *
- * Expected structuredContent shape:
+ * @param {HTMLElement} block  - The block DOM element
+ * @param {MCPBridge}   bridge - The MCP Apps bridge instance
+ *
+ * Expected structuredContent:
  * {
  *   title?: string,
  *   products: [
- *     {
- *       name: string,
- *       description: string,
- *       price?: string | number,
- *       imageUrl?: string,
- *       category?: string,
- *       rating?: number,
- *       url?: string
- *     }
+ *     { name, description, price?, imageUrl?, category?, rating?, url? }
  *   ]
  * }
  */
 
-function createProductCard(product) {
+function createProductCard(product, bridge) {
   const card = document.createElement('div');
   card.className = 'showcase-card';
 
@@ -58,7 +53,8 @@ function createProductCard(product) {
   if (product.rating) {
     const rating = document.createElement('div');
     rating.className = 'showcase-rating';
-    const stars = '★'.repeat(Math.round(product.rating)) + '☆'.repeat(5 - Math.round(product.rating));
+    const stars = '★'.repeat(Math.round(product.rating))
+      + '☆'.repeat(5 - Math.round(product.rating));
     rating.innerHTML = `<span class="showcase-stars">${stars}</span> <span class="showcase-rating-value">${product.rating}</span>`;
     body.appendChild(rating);
   }
@@ -79,15 +75,18 @@ function createProductCard(product) {
     body.appendChild(price);
   }
 
-  if (product.url) {
-    const cta = document.createElement('a');
-    cta.className = 'showcase-cta';
-    cta.href = product.url;
-    cta.target = '_blank';
-    cta.rel = 'noopener noreferrer';
-    cta.textContent = 'Learn More';
-    body.appendChild(cta);
-  }
+  // CTA — uses bridge.sendMessage() to ask the model for more info
+  const cta = document.createElement('button');
+  cta.className = 'showcase-cta';
+  cta.textContent = 'Tell me more';
+  cta.addEventListener('click', () => {
+    if (bridge.isConnected) {
+      bridge.sendMessage(`Tell me more about "${product.name}".`);
+    } else if (product.url) {
+      window.open(product.url, '_blank');
+    }
+  });
+  body.appendChild(cta);
 
   card.appendChild(body);
   return card;
@@ -126,24 +125,41 @@ function createCarouselArrows(container, block) {
   block.appendChild(rightArrow);
 }
 
-export default async function decorate(block, onDataLoaded, onThemeChanged) {
+function renderProducts(block, products, title, bridge) {
+  block.textContent = '';
+
+  // Optional title
+  if (title) {
+    const heading = document.createElement('h2');
+    heading.className = 'showcase-heading';
+    heading.textContent = title;
+    block.appendChild(heading);
+  }
+
+  // Carousel
+  const container = document.createElement('div');
+  container.className = 'showcase-container';
+
+  products.forEach((product) => {
+    container.appendChild(createProductCard(product, bridge));
+  });
+
+  block.appendChild(container);
+
+  if (products.length > 2) {
+    createCarouselArrows(container, block);
+  }
+}
+
+export default async function decorate(block, bridge) {
   block.textContent = 'Loading products...';
   block.className = 'product-showcase';
 
-  // Theme support
-  if (onThemeChanged) {
-    onThemeChanged((theme) => {
-      block.setAttribute('data-theme', theme);
-    });
-  } else {
-    block.setAttribute('data-theme', 'light');
-  }
-
-  onDataLoaded.then((data) => {
-    block.textContent = '';
-
-    // Handle both: direct data and wrapped in structuredContent
-    const payload = data?.structuredContent || data;
+  // Wait for the tool result (one per widget lifecycle — ChatGPT
+  // destroys and recreates the iframe on each new tool invocation)
+  try {
+    const result = await bridge.toolResult;
+    const payload = result?.structuredContent || result;
     const products = payload?.products;
 
     if (!products || !Array.isArray(products) || products.length === 0) {
@@ -151,31 +167,17 @@ export default async function decorate(block, onDataLoaded, onThemeChanged) {
       return;
     }
 
-    // Optional title
-    if (payload.title) {
-      const heading = document.createElement('h2');
-      heading.className = 'showcase-heading';
-      heading.textContent = payload.title;
-      block.appendChild(heading);
+    renderProducts(block, products, payload.title, bridge);
+
+    // Tell the model what we rendered
+    if (bridge.isConnected) {
+      bridge.updateModelContext(
+        `Product showcase displayed ${products.length} products: ${products.map((p) => p.name).join(', ')}.`,
+      );
     }
-
-    // Carousel
-    const container = document.createElement('div');
-    container.className = 'showcase-container';
-
-    products.forEach((product) => {
-      container.appendChild(createProductCard(product));
-    });
-
-    block.appendChild(container);
-
-    // Only add arrows if content overflows
-    if (products.length > 2) {
-      createCarouselArrows(container, block);
-    }
-  }).catch((error) => {
+  } catch (error) {
     block.textContent = 'Error loading products.';
     // eslint-disable-next-line no-console
     console.error('Product showcase error:', error);
-  });
+  }
 }
