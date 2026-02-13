@@ -412,6 +412,132 @@
   }
 }
 
+/* Expand icon on image hover */
+.showcase-expand {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgb(0 0 0 / 50%);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.showcase-card-image:hover .showcase-expand {
+  opacity: 1;
+}
+
+/* ─── Fullscreen detail view (ChatGPT extension) ──────────────── */
+.showcase-detail {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: var(--ps-card-bg);
+  overflow-y: auto;
+  animation: showcase-detail-in 0.3s ease;
+}
+
+@keyframes showcase-detail-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.showcase-detail-back {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--ps-card-bg);
+  border: none;
+  border-bottom: 1px solid var(--ps-border);
+  color: var(--ps-accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.showcase-detail-back:hover {
+  background: var(--ps-accent);
+  color: #fff;
+}
+
+.showcase-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px;
+}
+
+@media (min-width: 600px) {
+  .showcase-detail-content {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 32px;
+  }
+}
+
+.showcase-detail-image {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.showcase-detail-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.showcase-detail-info h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ps-text);
+  margin: 0;
+}
+
+.showcase-detail-price {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ps-price);
+  margin: 0;
+}
+
+.showcase-detail-desc {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ps-text-muted);
+  margin: 0;
+}
+
+.showcase-detail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.showcase-detail-actions .showcase-cta {
+  padding: 12px 24px;
+  font-size: 15px;
+  flex: 0;
+}
+
 /* Transparent background for ChatGPT integration */
 aem-embed body {
   background-color: transparent;

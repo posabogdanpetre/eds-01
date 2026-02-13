@@ -44,6 +44,112 @@
 // Shared state: tracks which products the user has favorited
 const favorites = new Set();
 
+// ─── Fullscreen detail view (ChatGPT extension) ─────────────────────
+
+function showDetailView(product, block, bridge) {
+  // Remember we're in detail mode
+  block.dataset.detail = 'true';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'showcase-detail';
+
+  // Back button → return to inline carousel
+  const backBtn = document.createElement('button');
+  backBtn.className = 'showcase-detail-back';
+  backBtn.textContent = '← Back to products';
+  backBtn.addEventListener('click', async () => {
+    overlay.remove();
+    delete block.dataset.detail;
+    if (bridge.chatgpt) {
+      try { await bridge.chatgpt.requestDisplayMode({ mode: 'inline' }); }
+      catch { /* host may not support it */ }
+    }
+  });
+  overlay.appendChild(backBtn);
+
+  const content = document.createElement('div');
+  content.className = 'showcase-detail-content';
+
+  // Large image
+  if (product.imageUrl) {
+    const img = document.createElement('img');
+    img.className = 'showcase-detail-image';
+    img.src = product.imageUrl;
+    img.alt = product.name || 'Product';
+    content.appendChild(img);
+  }
+
+  const info = document.createElement('div');
+  info.className = 'showcase-detail-info';
+
+  if (product.category) {
+    const cat = document.createElement('span');
+    cat.className = 'showcase-badge';
+    cat.textContent = product.category;
+    info.appendChild(cat);
+  }
+
+  const title = document.createElement('h2');
+  title.textContent = product.name;
+  info.appendChild(title);
+
+  if (product.rating) {
+    const rating = document.createElement('div');
+    rating.className = 'showcase-rating';
+    const stars = '★'.repeat(Math.round(product.rating))
+      + '☆'.repeat(5 - Math.round(product.rating));
+    rating.innerHTML = `<span class="showcase-stars">${stars}</span> <span class="showcase-rating-value">${product.rating}</span>`;
+    info.appendChild(rating);
+  }
+
+  if (product.price != null) {
+    const price = document.createElement('p');
+    price.className = 'showcase-detail-price';
+    price.textContent = typeof product.price === 'number'
+      ? `$${product.price.toLocaleString()}`
+      : product.price;
+    info.appendChild(price);
+  }
+
+  if (product.description) {
+    const desc = document.createElement('p');
+    desc.className = 'showcase-detail-desc';
+    desc.textContent = product.description;
+    info.appendChild(desc);
+  }
+
+  // Action buttons in detail view
+  const actions = document.createElement('div');
+  actions.className = 'showcase-detail-actions';
+
+  const tellMore = document.createElement('button');
+  tellMore.className = 'showcase-cta';
+  tellMore.textContent = 'Tell me more';
+  tellMore.addEventListener('click', () => {
+    if (bridge.isConnected) {
+      bridge.sendMessage(`Tell me more about "${product.name}".`);
+    }
+  });
+  actions.appendChild(tellMore);
+
+  const findSimilar = document.createElement('button');
+  findSimilar.className = 'showcase-cta showcase-cta-secondary';
+  findSimilar.textContent = 'Find similar';
+  findSimilar.addEventListener('click', () => {
+    if (bridge.isConnected) {
+      bridge.sendMessage(
+        `Find me products similar to "${product.name}" in the ${product.price != null ? `$${product.price}` : 'same'} price range.`,
+      );
+    }
+  });
+  actions.appendChild(findSimilar);
+
+  info.appendChild(actions);
+  content.appendChild(info);
+  overlay.appendChild(content);
+  block.appendChild(overlay);
+}
+
 // ─── Card creation ───────────────────────────────────────────────────
 
 function createProductCard(product, index, bridge) {
@@ -60,6 +166,27 @@ function createProductCard(product, index, bridge) {
     img.alt = product.name || 'Product';
     img.loading = 'lazy';
     imageContainer.appendChild(img);
+
+    // ★ ChatGPT extension: click image → fullscreen detail view
+    //   requestDisplayMode asks ChatGPT to expand the widget container.
+    //   On other hosts this is gracefully skipped (detail view still shows).
+    const expandIcon = document.createElement('span');
+    expandIcon.className = 'showcase-expand';
+    expandIcon.textContent = '⛶';
+    expandIcon.setAttribute('aria-label', 'View fullscreen');
+    imageContainer.appendChild(expandIcon);
+
+    imageContainer.style.cursor = 'pointer';
+    imageContainer.addEventListener('click', async (e) => {
+      // Don't trigger if they clicked the favorite button
+      if (e.target.closest('.showcase-fav')) return;
+      const parentBlock = imageContainer.closest('.product-showcase');
+      if (bridge.chatgpt) {
+        try { await bridge.chatgpt.requestDisplayMode({ mode: 'fullscreen' }); }
+        catch { /* host may not support it */ }
+      }
+      showDetailView(product, parentBlock, bridge);
+    });
 
     if (product.category) {
       const badge = document.createElement('span');
