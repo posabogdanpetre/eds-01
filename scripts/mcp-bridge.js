@@ -10,14 +10,24 @@
  * Spec:  https://modelcontextprotocol.github.io/ext-apps
  * Ref:   https://developers.openai.com/apps-sdk/reference
  *
- * Protocol methods implemented:
+ * ── Standard protocol ──────────────────────────────────────────
  *   ui/initialize                  → bridge.connect()
  *   ui/notifications/initialized   → (automatic after connect)
  *   ui/notifications/tool-result   → bridge.toolResult   (Promise)
  *   ui/notifications/tool-input    → bridge.toolInput    (Promise)
  *   tools/call                     → bridge.callTool(name, args)
- *   ui/message                     → bridge.sendMessage(text)  (Request)
+ *   ui/message                     → bridge.sendMessage(text)
  *   ui/update-model-context        → bridge.updateModelContext(text)
+ *
+ * ── Vendor extensions (auto-detected) ──────────────────────────
+ *   bridge.host                    → 'chatgpt' | 'claude' | 'unknown'
+ *   bridge.chatgpt                 → ChatGPT extensions (or null)
+ *     .theme / .locale / .displayMode / .maxHeight / .safeArea
+ *     .widgetState / .setWidgetState(state)
+ *     .uploadFile(file) / .getFileDownloadUrl({ fileId })
+ *     .requestDisplayMode(opts) / .requestModal(opts) / .requestClose()
+ *     .openExternal(opts) / .requestCheckout(opts)
+ *     .watchContext(callback)      → observe theme/locale changes
  *
  * @example
  *   import { MCPBridge } from './mcp-bridge.js';
@@ -25,12 +35,203 @@
  *   const bridge = new MCPBridge();
  *   await bridge.connect();
  *
+ *   // Standard protocol
  *   const result = await bridge.toolResult;
  *   renderUI(result.structuredContent);
+ *
+ *   // ChatGPT extensions (auto-detected)
+ *   if (bridge.chatgpt) {
+ *     console.log(bridge.chatgpt.theme);   // 'dark'
+ *     const stop = bridge.chatgpt.watchContext(ctx => {
+ *       document.body.dataset.theme = ctx.theme;
+ *     });
+ *   }
  */
 
 const PROTOCOL_VERSION = '2026-01-26';
 const LOG_PREFIX = '[MCPBridge]';
+
+// ---------------------------------------------------------------
+// Vendor Extensions — ChatGPT  (window.openai)
+// ---------------------------------------------------------------
+
+/**
+ * Thin wrapper around ChatGPT's `window.openai` runtime.
+ * Feature-detects every call — safe to use even when a method
+ * doesn't exist on the current host version.
+ *
+ * @private — accessed via `bridge.chatgpt`, never instantiated directly.
+ */
+class ChatGPTExtensions {
+  /** @param {object} api — reference to `window.openai` */
+  constructor(api) {
+    this._api = api;
+    this._watchers = [];
+    this._pollId = null;
+    this._prev = null;
+  }
+
+  // --- Context (read-only) ------------------------------------
+
+  /** Host colour scheme. @returns {'light'|'dark'|null} */
+  get theme() { return this._api.theme ?? null; }
+
+  /** User locale (BCP 47). @returns {string|null} */
+  get locale() { return this._api.locale ?? null; }
+
+  /** Current display mode. @returns {'inline'|'pip'|'fullscreen'|null} */
+  get displayMode() { return this._api.displayMode ?? null; }
+
+  /** Widget max-height in pixels. @returns {number|null} */
+  get maxHeight() { return this._api.maxHeight ?? null; }
+
+  /** Safe-area insets { top, bottom, left, right }. @returns {object|null} */
+  get safeArea() { return this._api.safeArea ?? null; }
+
+  /** Current view identifier. @returns {string|null} */
+  get view() { return this._api.view ?? null; }
+
+  /** Host user-agent string. @returns {string|null} */
+  get userAgent() { return this._api.userAgent ?? null; }
+
+  // --- State persistence --------------------------------------
+
+  /** Persisted UI state snapshot. */
+  get widgetState() { return this._api.widgetState ?? null; }
+
+  /** Persist a new UI state snapshot (synchronous, host persists async). */
+  setWidgetState(state) { this._api.setWidgetState?.(state); }
+
+  // --- File APIs ----------------------------------------------
+
+  /**
+   * Upload a file and receive a `fileId`.
+   * Supports image/png, image/jpeg, image/webp.
+   * @param {File} file
+   * @returns {Promise<{ fileId: string }>}
+   */
+  uploadFile(file) { return this._call('uploadFile', file); }
+
+  /**
+   * Get a temporary download URL for a file.
+   * @param {{ fileId: string }} opts
+   * @returns {Promise<{ downloadUrl: string }>}
+   */
+  getFileDownloadUrl(opts) { return this._call('getFileDownloadUrl', opts); }
+
+  // --- UI Control ---------------------------------------------
+
+  /**
+   * Request a display mode change.
+   * @param {{ mode: 'inline'|'pip'|'fullscreen' }} opts
+   * @returns {Promise<void>}
+   */
+  requestDisplayMode(opts) { return this._call('requestDisplayMode', opts); }
+
+  /**
+   * Open a host-controlled modal, optionally targeting another
+   * registered template URI.
+   * @param {{ template?: string, params?: object }} [opts]
+   * @returns {Promise<void>}
+   */
+  requestModal(opts) { return this._call('requestModal', opts); }
+
+  /** Close this widget. */
+  requestClose() { this._api.requestClose?.(); }
+
+  /**
+   * Open Instant Checkout (when enabled).
+   * @param {object} opts — checkout payload
+   * @returns {Promise<void>}
+   */
+  requestCheckout(opts) { return this._call('requestCheckout', opts); }
+
+  /**
+   * Open a vetted external link in the user's browser.
+   * @param {{ href: string }} opts
+   */
+  openExternal(opts) { this._api.openExternal?.(opts); }
+
+  /**
+   * Set the "Open in <App>" URL shown in fullscreen mode.
+   * @param {{ href: string }} opts
+   */
+  setOpenInAppUrl(opts) { this._api.setOpenInAppUrl?.(opts); }
+
+  /**
+   * Report dynamic widget height to avoid scroll clipping.
+   * @param {number|object} heightOrOpts
+   */
+  notifyIntrinsicHeight(heightOrOpts) {
+    this._api.notifyIntrinsicHeight?.(heightOrOpts);
+  }
+
+  // --- Context observation ------------------------------------
+
+  /**
+   * Watch for changes in host context (theme, locale, displayMode, maxHeight).
+   * Polls at the given interval and fires `callback(snapshot)` on change.
+   *
+   * @param {function} callback — receives { theme, locale, displayMode, maxHeight }
+   * @param {number} [interval=500] — polling interval in ms
+   * @returns {function} unsubscribe — call it to stop watching
+   *
+   * @example
+   *   const stop = bridge.chatgpt.watchContext(ctx => {
+   *     document.body.dataset.theme = ctx.theme;
+   *   });
+   *   // later: stop();
+   */
+  watchContext(callback, interval = 500) {
+    this._watchers.push(callback);
+    if (!this._pollId) {
+      this._prev = JSON.stringify(this._snap());
+      this._pollId = setInterval(() => {
+        const snap = this._snap();
+        const json = JSON.stringify(snap);
+        if (json !== this._prev) {
+          this._prev = json;
+          this._watchers.forEach((fn) => fn(snap));
+        }
+      }, interval);
+    }
+    return () => {
+      this._watchers = this._watchers.filter((fn) => fn !== callback);
+      if (!this._watchers.length) {
+        clearInterval(this._pollId);
+        this._pollId = null;
+      }
+    };
+  }
+
+  // --- Internal -----------------------------------------------
+
+  /** @private */
+  _call(method, ...args) {
+    const fn = this._api[method];
+    if (!fn) {
+      return Promise.reject(new Error(`chatgpt.${method} is not available`));
+    }
+    return fn.apply(this._api, args);
+  }
+
+  /** @private */
+  _snap() {
+    return {
+      theme: this.theme,
+      locale: this.locale,
+      displayMode: this.displayMode,
+      maxHeight: this.maxHeight,
+    };
+  }
+
+  /** @private */
+  destroy() {
+    clearInterval(this._pollId);
+    this._pollId = null;
+    this._watchers = [];
+  }
+}
 
 // ---------------------------------------------------------------
 // MCPBridge
@@ -61,6 +262,9 @@ export class MCPBridge {
     this.toolInput = new Promise((resolve) => {
       this._toolInputResolve = resolve;
     });
+
+    // Vendor extensions (lazy-initialised on first access)
+    this._chatgpt = undefined;
   }
 
   // ---------------------------------------------------------------
@@ -75,6 +279,33 @@ export class MCPBridge {
   /** Whether the ui/initialize handshake has completed. */
   get isConnected() {
     return this._connected;
+  }
+
+  /**
+   * Detected host name.
+   * @returns {'chatgpt'|'claude'|'unknown'|null}
+   */
+  get host() {
+    if (typeof window === 'undefined') return null;
+    if (window.openai) return 'chatgpt';
+    try {
+      if (window.location.origin.includes('claudemcpcontent.com')) return 'claude';
+    } catch { /* cross-origin access may throw */ }
+    return 'unknown';
+  }
+
+  /**
+   * ChatGPT vendor extensions (via `window.openai`).
+   * Returns `null` when not running inside ChatGPT.
+   *
+   * @returns {ChatGPTExtensions|null}
+   */
+  get chatgpt() {
+    if (this._chatgpt === undefined) {
+      const api = typeof window !== 'undefined' ? window.openai : null;
+      this._chatgpt = api ? new ChatGPTExtensions(api) : null;
+    }
+    return this._chatgpt;
   }
 
   // ---------------------------------------------------------------
@@ -109,7 +340,7 @@ export class MCPBridge {
       this.notify('ui/notifications/initialized', {});
       this._connected = true;
       // eslint-disable-next-line no-console
-      console.log(`${LOG_PREFIX} Connected`);
+      console.log(`${LOG_PREFIX} Connected (host: ${this.host})`);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(`${LOG_PREFIX} Handshake failed:`, err);
@@ -118,7 +349,7 @@ export class MCPBridge {
     return this;
   }
 
-  /** Stop listening and clean up. */
+  /** Stop listening and clean up (including vendor extensions). */
   destroy() {
     this._destroyed = true;
     this._connected = false;
@@ -128,10 +359,11 @@ export class MCPBridge {
     }
     this._pendingRequests.forEach(({ reject }) => reject(new Error('Bridge destroyed')));
     this._pendingRequests.clear();
+    if (this._chatgpt && this._chatgpt.destroy) this._chatgpt.destroy();
   }
 
   // ---------------------------------------------------------------
-  // Actions — sending to host
+  // Actions — sending to host (standard protocol)
   // ---------------------------------------------------------------
 
   /**

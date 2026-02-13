@@ -19,6 +19,14 @@
  *     what they scrolled past, what they selected — so the model can
  *     give smarter recommendations without the user having to explain.
  *
+ * ─── CHATGPT EXTENSIONS DEMO ────────────────────────────────────────
+ *
+ *   bridge.chatgpt.widgetState / bridge.chatgpt.setWidgetState(state)
+ *     ChatGPT-specific state persistence. Favorites survive widget
+ *     re-renders — the host persists a snapshot between renders.
+ *     When the widget mounts, we restore favorites from the snapshot.
+ *     NOT available in other hosts (gracefully ignored).
+ *
  * ─────────────────────────────────────────────────────────────────────
  *
  * @param {HTMLElement} block  - The block DOM element
@@ -89,6 +97,14 @@ function createProductCard(product, index, bridge) {
             ? `User's favorite products: ${favList.join(', ')}.`
             : 'User cleared all favorites.',
         );
+      }
+
+      // ★ ChatGPT extension: persist favorites to widgetState
+      //   This survives widget re-renders — when the user scrolls away
+      //   and comes back, ChatGPT restores this snapshot automatically.
+      //   Gracefully ignored on other hosts (bridge.chatgpt is null).
+      if (bridge.chatgpt) {
+        bridge.chatgpt.setWidgetState({ favorites: [...favorites] });
       }
 
       // Update the compare button visibility
@@ -313,6 +329,17 @@ export default async function decorate(block, bridge) {
   block.className = 'product-showcase';
 
   try {
+    // ★ ChatGPT extension: restore favorites from persisted widgetState.
+    //   When ChatGPT re-renders the widget (e.g. user scrolls away and back),
+    //   it restores the snapshot we saved with setWidgetState().
+    //   On other hosts bridge.chatgpt is null — this block is simply skipped.
+    const savedState = bridge.chatgpt?.widgetState;
+    if (savedState?.favorites?.length) {
+      savedState.favorites.forEach((name) => favorites.add(name));
+      // eslint-disable-next-line no-console
+      console.log(`[ProductShowcase] Restored ${favorites.size} favorites from ChatGPT widgetState`);
+    }
+
     const result = await bridge.toolResult;
     const payload = result?.structuredContent || result;
     const products = payload?.products;
@@ -323,6 +350,23 @@ export default async function decorate(block, bridge) {
     }
 
     renderProducts(block, products, payload.title, bridge);
+
+    // ★ ChatGPT extension: apply restored favorites to the rendered cards.
+    //   After rendering, walk the cards and toggle the heart buttons for
+    //   any products that were previously favorited.
+    if (favorites.size > 0) {
+      block.querySelectorAll('.showcase-card').forEach((card) => {
+        const nameEl = card.querySelector('.showcase-product-name');
+        if (nameEl && favorites.has(nameEl.textContent)) {
+          const favBtn = card.querySelector('.showcase-fav');
+          if (favBtn) {
+            favBtn.textContent = '♥';
+            favBtn.classList.add('active');
+          }
+        }
+      });
+      updateCompareButton(block);
+    }
 
     // Store bridge ref for the compare bar
     const bar = block.querySelector('.showcase-compare-bar');
@@ -335,8 +379,11 @@ export default async function decorate(block, bridge) {
       const summary = products
         .map((p) => `${p.name}${p.price != null ? ` ($${p.price})` : ''}`)
         .join(', ');
+      const favNote = favorites.size > 0
+        ? ` User previously favorited: ${[...favorites].join(', ')}.`
+        : '';
       bridge.updateModelContext(
-        `Product showcase displayed ${products.length} products: ${summary}.`,
+        `Product showcase displayed ${products.length} products: ${summary}.${favNote}`,
       );
     }
   } catch (error) {
