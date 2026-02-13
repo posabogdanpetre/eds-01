@@ -292,6 +292,22 @@
   outline: none;
 }
 
+.showcase-cta-link {
+  background: transparent;
+  color: var(--ps-accent);
+  border: none;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 8px 6px;
+  flex: 0;
+  white-space: nowrap;
+}
+
+.showcase-cta-link:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
 /* Compare favorites bar */
 .showcase-compare-bar {
   display: flex;

@@ -144,6 +144,23 @@ function showDetailView(product, block, bridge) {
   });
   actions.appendChild(findSimilar);
 
+  // ★ ChatGPT extension: openExternal — opens the product page
+  if (product.url) {
+    const viewLink = document.createElement('a');
+    viewLink.className = 'showcase-cta showcase-cta-link';
+    viewLink.textContent = 'View product ↗';
+    viewLink.href = product.url;
+    viewLink.target = '_blank';
+    viewLink.rel = 'noopener noreferrer';
+    viewLink.addEventListener('click', (e) => {
+      if (bridge.chatgpt) {
+        e.preventDefault();
+        bridge.chatgpt.openExternal({ href: product.url });
+      }
+    });
+    actions.appendChild(viewLink);
+  }
+
   info.appendChild(actions);
   content.appendChild(info);
   overlay.appendChild(content);
@@ -318,6 +335,27 @@ function createProductCard(product, index, bridge) {
     }
   });
   actions.appendChild(findSimilar);
+
+  // ★ "VIEW PRODUCT" link
+  //   → ChatGPT extension: openExternal opens a vetted link in the user's
+  //     browser. ChatGPT shows a safe-link confirmation before navigating.
+  //     On other hosts, falls back to a regular <a> link.
+  if (product.url) {
+    const viewLink = document.createElement('a');
+    viewLink.className = 'showcase-cta showcase-cta-link';
+    viewLink.textContent = 'View ↗';
+    viewLink.href = product.url;
+    viewLink.target = '_blank';
+    viewLink.rel = 'noopener noreferrer';
+    viewLink.addEventListener('click', (e) => {
+      if (bridge.chatgpt) {
+        e.preventDefault();
+        bridge.chatgpt.openExternal({ href: product.url });
+      }
+      // else: default <a> behavior — opens in new tab
+    });
+    actions.appendChild(viewLink);
+  }
 
   body.appendChild(actions);
   card.appendChild(body);
