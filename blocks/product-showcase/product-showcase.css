@@ -258,10 +258,20 @@
   cursor: pointer;
   transition: background 0.2s ease;
   flex: 1;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .showcase-cta:hover {
   background: var(--ps-accent-hover);
+}
+
+.showcase-cta:focus,
+.showcase-cta:active {
+  background: var(--ps-accent-hover);
+  color: #fff;
+  outline: none;
 }
 
 .showcase-cta-secondary {
@@ -273,6 +283,13 @@
 .showcase-cta-secondary:hover {
   background: var(--ps-accent);
   color: #fff;
+}
+
+.showcase-cta-secondary:focus,
+.showcase-cta-secondary:active {
+  background: var(--ps-accent);
+  color: #fff;
+  outline: none;
 }
 
 /* Compare favorites bar */
