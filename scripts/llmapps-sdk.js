@@ -392,14 +392,15 @@ export class LLMAppsBridge {
 
   /**
    * Post a follow-up message in the conversation.
-   * Per spec, content is a single ContentBlock (not an array).
+   * Note: spec shows content as a single ContentBlock, but hosts
+   * (ChatGPT) validate it as an array. Using array for compatibility.
    * @param {string} text - Message text
    * @returns {Promise<Object>} Host response
    */
   async sendMessage(text) {
     return this.request('ui/message', {
       role: 'user',
-      content: { type: 'text', text },
+      content: [{ type: 'text', text }],
     });
   }
 
