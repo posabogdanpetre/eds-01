@@ -1,0 +1,151 @@
+.frescopa-coffee-details {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 24px;
+  box-sizing: border-box;
+  font-family: Georgia, "Times New Roman", serif;
+  background: #fff;
+}
+
+.coffee-detail-container {
+  display: flex;
+  gap: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Image Section */
+.coffee-detail-image-section {
+  flex: 0 0 320px;
+  background: #faf8f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.coffee-detail-image {
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: contain;
+}
+
+/* Info Section */
+.coffee-detail-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.coffee-detail-category {
+  display: inline-block;
+  background: #f5f0eb;
+  color: #6b5344;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 12px;
+  border-radius: 3px;
+  width: fit-content;
+}
+
+.coffee-detail-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  font-weight: 400;
+  font-style: italic;
+  color: #4a3728;
+  margin: 8px 0 0;
+  line-height: 1.2;
+}
+
+.coffee-detail-sku {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  color: #8b7a6b;
+  letter-spacing: 0.5px;
+}
+
+.coffee-detail-price {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #6b1f1f;
+  margin: 8px 0;
+}
+
+.coffee-detail-short-desc {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  color: #5c4a3d;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.coffee-detail-divider {
+  border: none;
+  border-top: 1px solid #e8e0d8;
+  margin: 12px 0;
+}
+
+.coffee-detail-long-desc {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  color: #6b5e52;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.no-coffee {
+  text-align: center;
+  padding: 40px;
+  color: #5c4a3d;
+  font-size: 16px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* Responsive design */
+@media (width <= 768px) {
+  .frescopa-coffee-details {
+    padding: 16px;
+  }
+
+  .coffee-detail-container {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .coffee-detail-image-section {
+    flex: none;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .coffee-detail-title {
+    font-size: 24px;
+  }
+
+  .coffee-detail-price {
+    font-size: 20px;
+  }
+
+  .coffee-detail-short-desc {
+    font-size: 14px;
+  }
+
+  .coffee-detail-long-desc {
+    font-size: 13px;
+  }
+}
+
+/* Ensure widget background is transparent */
+aem-embed body {
+  background-color: transparent;
+}

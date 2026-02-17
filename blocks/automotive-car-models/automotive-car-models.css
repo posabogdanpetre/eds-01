@@ -1,0 +1,415 @@
+/*
+ * ADOBE CONFIDENTIAL
+ * ___________________
+ * Copyright 2025 Adobe
+ * All Rights Reserved.
+ * NOTICE: All information contained herein is, and remains
+ * the property of Adobe and its suppliers, if any. The intellectual
+ * and technical concepts contained herein are proprietary to Adobe
+ * and its suppliers and are protected by all applicable intellectual
+ * property laws, including trade secret and copyright laws.
+ *  Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from Adobe.
+ */
+
+/* Theme Support - CSS Custom Properties */
+.automotive-car-models {
+  /* Light theme (default) - Blueish stylish theme */
+  --automotive-bg: transparent;
+  --automotive-card-bg: #fff;
+  --automotive-text-primary: #262626;
+  --automotive-text-secondary: #666;
+  --automotive-button-bg: #1e40af;
+  --automotive-button-text: #fff;
+  --automotive-button-hover-bg: #1e3a8a;
+  --automotive-button-hover-text: #fff;
+  --automotive-button-border: #1e40af;
+  --automotive-card-shadow: rgb(0 0 0 / 8%);
+  --automotive-card-shadow-hover: rgb(30 64 175 / 15%);
+  --automotive-arrow-bg: #2563eb;
+  --automotive-arrow-text: #fff;
+  --automotive-arrow-bg-hover: #1d4ed8;
+  --automotive-arrow-shadow: rgb(37 99 235 / 25%);
+  --automotive-arrow-shadow-hover: rgb(37 99 235 / 35%);
+}
+
+/* Dark theme support - via system preference */
+@media (prefers-color-scheme: dark) {
+  .automotive-car-models {
+    --automotive-bg: transparent;
+    --automotive-card-bg: #2a2a2a;
+    --automotive-text-primary: #e8e8e8;
+    --automotive-text-secondary: #b3b3b3;
+    --automotive-button-bg: #3b82f6;
+    --automotive-button-text: #fff;
+    --automotive-button-hover-bg: #60a5fa;
+    --automotive-button-hover-text: #fff;
+    --automotive-button-border: #3b82f6;
+    --automotive-card-shadow: rgb(0 0 0 / 30%);
+    --automotive-card-shadow-hover: rgb(59 130 246 / 20%);
+    --automotive-arrow-bg: #3b82f6;
+    --automotive-arrow-text: #fff;
+    --automotive-arrow-bg-hover: #60a5fa;
+    --automotive-arrow-shadow: rgb(59 130 246 / 25%);
+    --automotive-arrow-shadow-hover: rgb(59 130 246 / 35%);
+  }
+}
+
+/* Dark theme support - explicit override from ChatGPT */
+.automotive-car-models[data-theme="dark"] {
+  --automotive-bg: transparent;
+  --automotive-card-bg: #2a2a2a;
+  --automotive-text-primary: #e8e8e8;
+  --automotive-text-secondary: #b3b3b3;
+  --automotive-button-bg: #3b82f6;
+  --automotive-button-text: #fff;
+  --automotive-button-hover-bg: #60a5fa;
+  --automotive-button-hover-text: #fff;
+  --automotive-button-border: #3b82f6;
+  --automotive-card-shadow: rgb(0 0 0 / 30%);
+  --automotive-card-shadow-hover: rgb(59 130 246 / 20%);
+  --automotive-arrow-bg: #3b82f6;
+  --automotive-arrow-text: #fff;
+  --automotive-arrow-bg-hover: #60a5fa;
+  --automotive-arrow-shadow: rgb(59 130 246 / 25%);
+  --automotive-arrow-shadow-hover: rgb(59 130 246 / 35%);
+}
+
+/* Light theme - explicit override from ChatGPT */
+.automotive-car-models[data-theme="light"] {
+  --automotive-bg: transparent;
+  --automotive-card-bg: #fff;
+  --automotive-text-primary: #262626;
+  --automotive-text-secondary: #666;
+  --automotive-button-bg: #1e40af;
+  --automotive-button-text: #fff;
+  --automotive-button-hover-bg: #1e3a8a;
+  --automotive-button-hover-text: #fff;
+  --automotive-button-border: #1e40af;
+  --automotive-card-shadow: rgb(0 0 0 / 8%);
+  --automotive-card-shadow-hover: rgb(30 64 175 / 15%);
+  --automotive-arrow-bg: #2563eb;
+  --automotive-arrow-text: #fff;
+  --automotive-arrow-bg-hover: #1d4ed8;
+  --automotive-arrow-shadow: rgb(37 99 235 / 25%);
+  --automotive-arrow-shadow-hover: rgb(37 99 235 / 35%);
+
+  /* Base styles */
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 20px 50px;
+  position: relative;
+  overflow: visible;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--automotive-bg);
+}
+
+/* Carousel Container */
+.automotive-container {
+  display: flex;
+  gap: 24px;
+  overflow: auto visible;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 10px 5px 20px;
+  box-sizing: border-box;
+}
+
+.automotive-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card Styling - Theme-aware */
+.automotive-card {
+  position: relative;
+  background: transparent;
+  border-radius: 12px;
+  padding: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-width: 380px;
+  max-width: 380px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--automotive-card-shadow);
+}
+
+.automotive-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px var(--automotive-card-shadow-hover);
+}
+
+/* Card Image Area */
+.automotive-card-image {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Loading placeholder animation */
+.automotive-card-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 10%) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.automotive-card-image img.loaded ~ .automotive-card-image::before {
+  display: none;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.automotive-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.automotive-card-image img.loaded {
+  opacity: 1;
+}
+
+.automotive-card:hover .automotive-card-image img {
+  transform: scale(1.03);
+}
+
+/* Year Badge */
+.automotive-year-badge {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  padding: 4px 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Card Body */
+.automotive-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  flex-grow: 1;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 0 0 12px 12px;
+}
+
+/* Model Name */
+.automotive-model-name {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Lease Price */
+.automotive-lease-price {
+  font-size: 16px;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.automotive-lease-price strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Terms Text */
+.automotive-terms {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+/* CTA Button - Theme-aware */
+.automotive-cta-button {
+  background: var(--automotive-button-bg);
+  border: 1px solid var(--automotive-button-border);
+  color: var(--automotive-button-text);
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: center;
+  margin-top: 8px;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.automotive-cta-button:hover {
+  background: var(--automotive-button-hover-bg);
+  color: var(--automotive-button-hover-text);
+  border-color: var(--automotive-button-border);
+}
+
+/* No models message */
+.automotive-no-models {
+  text-align: center;
+  padding: 40px;
+  color: var(--automotive-text-secondary);
+  font-size: 16px;
+}
+
+/* Carousel Arrows - Theme-aware */
+.automotive-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--automotive-arrow-bg);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 4px 12px var(--automotive-arrow-shadow);
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--automotive-arrow-text);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.automotive-carousel-arrow:focus {
+  outline: none;
+  box-shadow: 0 4px 12px var(--automotive-arrow-shadow), 0 0 0 3px rgb(59 130 246 / 50%);
+}
+
+.automotive-carousel-arrow:hover:not(.disabled) {
+  background: var(--automotive-arrow-bg-hover);
+  box-shadow: 0 6px 16px var(--automotive-arrow-shadow-hover);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.automotive-carousel-arrow:active:not(.disabled) {
+  transform: translateY(-50%) scale(0.95);
+  background: var(--automotive-arrow-bg);
+}
+
+.automotive-carousel-arrow.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.automotive-carousel-arrow-left {
+  left: 10px;
+}
+
+.automotive-carousel-arrow-right {
+  right: 10px;
+}
+
+/* Responsive Design */
+@media (width <= 768px) {
+  .automotive-car-models {
+    padding: 12px 35px;
+  }
+
+  .automotive-container {
+    gap: 16px;
+  }
+
+  .automotive-card {
+    min-width: 300px;
+    max-width: 300px;
+  }
+
+  .automotive-card-image {
+    height: 180px;
+  }
+
+  .automotive-card-body {
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .automotive-model-name {
+    font-size: 18px;
+  }
+
+  .automotive-lease-price {
+    font-size: 14px;
+  }
+
+  .automotive-terms {
+    font-size: 13px;
+  }
+
+  .automotive-cta-button {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+
+  .automotive-carousel-arrow {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 20px;
+  }
+
+  .automotive-carousel-arrow-left {
+    left: 8px;
+  }
+
+  .automotive-carousel-arrow-right {
+    right: 8px;
+  }
+}
+
+/* Ensure widget background is transparent for ChatGPT integration */
+aem-embed body {
+  background-color: transparent;
+}
+
