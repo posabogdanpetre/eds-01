@@ -1,5 +1,5 @@
 /**
- * Product Showcase Block — uses MCPBridge SDK
+ * Product Showcase Block — uses LLMApps SDK
  *
  * Displays a horizontal carousel of product cards with interactive features
  * that demonstrate bridge.sendMessage() and bridge.updateModelContext().
@@ -19,6 +19,16 @@
  *     what they scrolled past, what they selected — so the model can
  *     give smarter recommendations without the user having to explain.
  *
+ * ─── STANDARD PROTOCOL FEATURES ─────────────────────────────────────
+ *
+ *   bridge.requestDisplayMode('fullscreen')
+ *     Standard MCP Apps method to request the host expand/contract the
+ *     widget. Works on any compliant host (ChatGPT, Claude, etc.).
+ *
+ *   bridge.openLink(url)
+ *     Standard MCP Apps method to open an external link through the host.
+ *     The host may show a confirmation dialog. Works on any compliant host.
+ *
  * ─── CHATGPT EXTENSIONS DEMO ────────────────────────────────────────
  *
  *   bridge.chatgpt.widgetState / bridge.chatgpt.setWidgetState(state)
@@ -30,7 +40,7 @@
  * ─────────────────────────────────────────────────────────────────────
  *
  * @param {HTMLElement} block  - The block DOM element
- * @param {MCPBridge}   bridge - The MCP Apps bridge instance
+ * @param {LLMAppsBridge} bridge - The LLM Apps bridge instance
  *
  * Expected structuredContent:
  * {
@@ -53,15 +63,15 @@ function showDetailView(product, block, bridge) {
   const overlay = document.createElement('div');
   overlay.className = 'showcase-detail';
 
-  // Back button → return to inline carousel
+  // Back button → return to inline carousel (standard protocol)
   const backBtn = document.createElement('button');
   backBtn.className = 'showcase-detail-back';
   backBtn.textContent = '← Back to products';
   backBtn.addEventListener('click', async () => {
     overlay.remove();
     delete block.dataset.detail;
-    if (bridge.chatgpt) {
-      try { await bridge.chatgpt.requestDisplayMode({ mode: 'inline' }); }
+    if (bridge.isConnected) {
+      try { await bridge.requestDisplayMode('inline'); }
       catch { /* host may not support it */ }
     }
   });
@@ -144,7 +154,7 @@ function showDetailView(product, block, bridge) {
   });
   actions.appendChild(findSimilar);
 
-  // ★ ChatGPT extension: openExternal — opens the product page
+  // ★ Standard protocol: openLink — opens the product page via the host
   if (product.url) {
     const viewLink = document.createElement('a');
     viewLink.className = 'showcase-cta showcase-cta-link';
@@ -153,9 +163,9 @@ function showDetailView(product, block, bridge) {
     viewLink.target = '_blank';
     viewLink.rel = 'noopener noreferrer';
     viewLink.addEventListener('click', (e) => {
-      if (bridge.chatgpt) {
+      if (bridge.isConnected) {
         e.preventDefault();
-        bridge.chatgpt.openExternal({ href: product.url });
+        bridge.openLink(product.url);
       }
     });
     actions.appendChild(viewLink);
@@ -184,9 +194,9 @@ function createProductCard(product, index, bridge) {
     img.loading = 'lazy';
     imageContainer.appendChild(img);
 
-    // ★ ChatGPT extension: click image → fullscreen detail view
-    //   requestDisplayMode asks ChatGPT to expand the widget container.
-    //   On other hosts this is gracefully skipped (detail view still shows).
+    // ★ Standard protocol: click image → fullscreen detail view
+    //   requestDisplayMode asks the host to expand the widget container.
+    //   Works on any MCP Apps compliant host (ChatGPT, Claude, etc.).
     const expandIcon = document.createElement('span');
     expandIcon.className = 'showcase-expand';
     expandIcon.textContent = '⛶';
@@ -198,8 +208,8 @@ function createProductCard(product, index, bridge) {
       // Don't trigger if they clicked the favorite button
       if (e.target.closest('.showcase-fav')) return;
       const parentBlock = imageContainer.closest('.product-showcase');
-      if (bridge.chatgpt) {
-        try { await bridge.chatgpt.requestDisplayMode({ mode: 'fullscreen' }); }
+      if (bridge.isConnected) {
+        try { await bridge.requestDisplayMode('fullscreen'); }
         catch { /* host may not support it */ }
       }
       showDetailView(product, parentBlock, bridge);
@@ -337,9 +347,9 @@ function createProductCard(product, index, bridge) {
   actions.appendChild(findSimilar);
 
   // ★ "VIEW PRODUCT" link
-  //   → ChatGPT extension: openExternal opens a vetted link in the user's
-  //     browser. ChatGPT shows a safe-link confirmation before navigating.
-  //     On other hosts, falls back to a regular <a> link.
+  //   → Standard protocol: openLink opens a vetted link through the host.
+  //     The host may show a confirmation dialog before navigating.
+  //     On non-connected hosts, falls back to a regular <a> link.
   if (product.url) {
     const viewLink = document.createElement('a');
     viewLink.className = 'showcase-cta showcase-cta-link';
@@ -348,9 +358,9 @@ function createProductCard(product, index, bridge) {
     viewLink.target = '_blank';
     viewLink.rel = 'noopener noreferrer';
     viewLink.addEventListener('click', (e) => {
-      if (bridge.chatgpt) {
+      if (bridge.isConnected) {
         e.preventDefault();
-        bridge.chatgpt.openExternal({ href: product.url });
+        bridge.openLink(product.url);
       }
       // else: default <a> behavior — opens in new tab
     });

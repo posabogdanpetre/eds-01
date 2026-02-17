@@ -1,20 +1,22 @@
 /*
- * AEM Embed WebComponent — powered by MCPBridge SDK
+ * AEM Embed WebComponent — powered by LLMApps SDK
  *
  * Loads AEM EDS content into any MCP Apps host (ChatGPT, Claude, etc.)
  * and passes an MCPBridge instance to each block for tool data and interaction.
  *
  * Block contract:  export default function decorate(block, bridge) { ... }
- *   - bridge.toolResult        → Promise<params> (one-shot, first tool result)
- *   - bridge.onToolResult(cb)  → subscribe to every tool result
- *   - bridge.onThemeChange(cb) → subscribe to theme (fires immediately + on change)
- *   - bridge.callTool(name, args) → call another MCP tool from the UI
- *   - bridge.sendMessage(text) → post a follow-up message
- *   - bridge.isEmbedded        → true if inside a host iframe
- *   - bridge.locale            → user locale
+ *   - bridge.toolResult              → Promise<params> (one-shot, first tool result)
+ *   - bridge.callTool(name, args)    → call another MCP tool from the UI
+ *   - bridge.sendMessage(text)       → post a follow-up message
+ *   - bridge.updateModelContext(text) → silently update model context
+ *   - bridge.openLink(url)           → open external link via host
+ *   - bridge.requestDisplayMode(mode)→ request inline/fullscreen/pip
+ *   - bridge.hostContext             → theme, locale, displayMode, styles, ...
+ *   - bridge.hostCapabilities        → openLinks, serverTools, logging, ...
+ *   - bridge.isEmbedded              → true if inside a host iframe
  */
 
-import { MCPBridge } from './mcp-bridge.js';
+import { LLMAppsBridge } from './llmapps-sdk.js';
 
 // eslint-disable-next-line import/prefer-default-export
 export class AEMEmbed extends HTMLElement {
@@ -29,7 +31,12 @@ export class AEMEmbed extends HTMLElement {
     [window.hlx.codeBasePath] = new URL(import.meta.url).pathname.split('/scripts/');
 
     // Create the bridge instance — shared by all blocks in this embed
-    this._bridge = new MCPBridge();
+    this._bridge = new LLMAppsBridge({
+      appInfo: { name: 'AEMEmbed', version: '1.0.0' },
+      appCapabilities: {
+        availableDisplayModes: ['inline', 'fullscreen'],
+      },
+    });
   }
 
   // ---------------------------------------------------------------
@@ -197,6 +204,10 @@ export class AEMEmbed extends HTMLElement {
 
         // Wait for bridge before loading blocks
         await bridgeReady;
+
+        // Apply host-provided CSS variables and fonts (if available)
+        this._bridge.applyHostStyles(this.shadowRoot.host);
+        this._bridge.applyContainerDimensions(this.shadowRoot.host);
 
         if (type === 'main') await this.handleMain(htmlText, body, origin);
         if (type === 'header') await this.handleHeader(htmlText, body, origin);
