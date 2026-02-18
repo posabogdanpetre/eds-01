@@ -466,6 +466,11 @@ export default async function decorate(block, bridge) {
   block.textContent = 'Loading test drive booking...';
   block.className = 'automotive-test-drive';
 
+  if (!bridge) {
+    block.innerHTML = '<p style="padding:16px;color:#888;">This block requires tool data from an LLM Apps host.</p>';
+    return;
+  }
+
   // Theme support via bridge context changes
   bridge.onContextChange((ctx) => {
     if (ctx.theme) block.setAttribute('data-theme', ctx.theme);

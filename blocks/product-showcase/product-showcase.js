@@ -503,6 +503,11 @@ export default async function decorate(block, bridge) {
   block.textContent = 'Loading products...';
   block.className = 'product-showcase';
 
+  if (!bridge) {
+    block.innerHTML = '<p style="padding:16px;color:#888;">This block requires tool data from an LLM Apps host.</p>';
+    return;
+  }
+
   try {
     // ★ ChatGPT extension: restore favorites from persisted widgetState.
     //   When ChatGPT re-renders the widget (e.g. user scrolls away and back),

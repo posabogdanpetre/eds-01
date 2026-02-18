@@ -78,6 +78,11 @@ export default async function decorate(block, bridge) {
   block.textContent = 'Loading Frescopa coffees...';
   block.className = 'frescopa-coffee-list';
 
+  if (!bridge) {
+    block.innerHTML = '<p class="no-coffee">This block requires tool data from an LLM Apps host.</p>';
+    return;
+  }
+
   try {
     const result = await bridge.toolResult;
     const data = result?.structuredContent || result;
