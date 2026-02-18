@@ -1,0 +1,327 @@
+<!--/*
+    Copyright 2026 Adobe
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/-->
+<sly data-sly-test.isAuthor="${wcmmode.edit || wcmmode.preview}"/>
+
+<script>
+    var baseXFpath = '/content/experience-fragments/wknd/us/en/';
+    var dynamicXFCarouselPaths = [];
+    var isAuthorMode = ${isAuthor @ context='scriptString'};
+
+    function makeRelativeToBase(fullPath, basePath) {
+        if (fullPath && fullPath.indexOf(basePath) === 0) {
+            return fullPath.substring(basePath.length);
+        }
+        return fullPath;
+    }
+</script>
+<sly data-sly-list.xfItem="${resource.listChildren}">
+    <sly data-sly-test="${xfItem.name == 'xfPaths'}">
+        <sly data-sly-list.pathItem="${xfItem.listChildren}">
+            <script>dynamicXFCarouselPaths.push(makeRelativeToBase('${pathItem.valueMap.xfPath @ context="scriptString"}', baseXFpath));</script>
+        </sly>
+    </sly>
+</sly>
+
+<!-- Carousel container - will be populated by JavaScript -->
+<div class="cmp-carousel cmp-carousel--dynamic"
+     data-dynamic-xf-carousel
+     role="group"
+     aria-roledescription="carousel">
+
+    <!-- Loading indicator -->
+    <div class="cmp-carousel__loading">
+        <p>Loading carousel...</p>
+    </div>
+</div>
+
+<!-- Client-side carousel initialization script -->
+<script type="module">
+import { LLMAppsBridge } from 'https://main--eds-01--posabogdanpetre.aem.page/scripts/llmapps-sdk.js';
+
+(async function() {
+    'use strict';
+
+    var baseUrl = window.llmApps ? window.llmApps.aemBaseUrl || '' : '';
+
+    if (isAuthorMode) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDynamicCarousel);
+        } else {
+            initDynamicCarousel();
+        }
+    } else {
+        const bridge = new LLMAppsBridge({
+            appInfo: { name: 'DynamicXFCarousel', version: '1.0.0' },
+        });
+
+        await bridge.connect();
+
+        const result = await bridge.toolResult;
+        const data = result?.structuredContent || result;
+
+        console.log('Bridge tool result received', data);
+
+        const experienceData = data?.experiences;
+        if (experienceData && Array.isArray(experienceData)) {
+            dynamicXFCarouselPaths = experienceData;
+        }
+
+        initDynamicCarousel();
+    }
+
+    function initDynamicCarousel() {
+        var carouselContainer = document.querySelector('[data-dynamic-xf-carousel]');
+
+        if (!carouselContainer) {
+            console.warn('Dynamic XF Carousel container not found');
+            return;
+        }
+
+        if (typeof dynamicXFCarouselPaths === 'undefined' || !dynamicXFCarouselPaths || dynamicXFCarouselPaths.length === 0) {
+            console.warn('No XF paths configured for carousel');
+            showError(carouselContainer, 'No Experience Fragment paths configured. Please configure XFs in the component dialog.');
+            return;
+        }
+
+        var paths = parseXFPaths(dynamicXFCarouselPaths);
+
+        if (paths.length === 0) {
+            console.warn('No valid XF paths found');
+            showError(carouselContainer, 'No valid Experience Fragment paths');
+            return;
+        }
+
+        console.log('Loading ' + paths.length + ' Experience Fragments for carousel');
+
+        var fullPaths = paths.map(function(path) {
+            return ensureMasterPath(path);
+        });
+
+        loadExperienceFragments(fullPaths, carouselContainer);
+    }
+
+    function parseXFPaths(value) {
+        var paths = [];
+
+        if (Array.isArray(value)) {
+            paths = value;
+        } else if (typeof value === 'string') {
+            if (value.indexOf(',') !== -1) {
+                paths = value.split(',').map(function(p) { return p.trim(); });
+            } else {
+                paths = [value.trim()];
+            }
+        }
+
+        return paths
+            .filter(function(p) { return p && p.length > 0; })
+            .map(function(p) { return baseXFpath + p; });
+    }
+
+    function ensureMasterPath(xfPath) {
+        var path = xfPath.trim();
+        path = path.replace(/\/+$/, '');
+        if (!path.endsWith('/master')) {
+            path += '/master';
+        }
+        return path;
+    }
+
+    function makePathsAbsolute(html) {
+        var tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        var attributesToFix = ['src', 'href', 'data-cmp-src', 'data-src'];
+
+        attributesToFix.forEach(function(attr) {
+            var elements = tempDiv.querySelectorAll('[' + attr + ']');
+            elements.forEach(function(element) {
+                var value = element.getAttribute(attr);
+                if (value && value.indexOf('/content/') === 0) {
+                    element.setAttribute(attr, baseUrl + value);
+                }
+            });
+        });
+
+        var srcsetElements = tempDiv.querySelectorAll('[srcset]');
+        srcsetElements.forEach(function(element) {
+            var srcset = element.getAttribute('srcset');
+            if (srcset) {
+                var newSrcset = srcset.replace(/\/content\/[^\s,]+/g, function(match) {
+                    return baseUrl + match;
+                });
+                element.setAttribute('srcset', newSrcset);
+            }
+        });
+
+        return tempDiv.innerHTML;
+    }
+
+    function loadExperienceFragments(paths, container) {
+        var loadedCount = 0;
+        var xfContents = new Array(paths.length);
+
+        paths.forEach(function(path, index) {
+            fetch(path + '.html')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('Failed to load XF: ' + path);
+                    }
+                    return response.text();
+                })
+                .then(function(html) {
+                    var processedHtml = makePathsAbsolute(html);
+                    xfContents[index] = processedHtml;
+                    loadedCount++;
+
+                    if (loadedCount === paths.length) {
+                        buildCarousel(xfContents, container);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading XF:', path, error);
+                    xfContents[index] = '<div class="cmp-carousel__error">Failed to load content</div>';
+                    loadedCount++;
+
+                    if (loadedCount === paths.length) {
+                        buildCarousel(xfContents, container);
+                    }
+                });
+        });
+    }
+
+    function buildCarousel(xfContents, container) {
+        var carouselHTML = '<div class="cmp-carousel__content" aria-atomic="false" aria-live="polite">';
+
+        xfContents.forEach(function(content, index) {
+            var isActive = index === 0 ? ' cmp-carousel__item--active' : '';
+            carouselHTML += '<div class="cmp-carousel__item' + isActive + '" ' +
+                           'role="tabpanel" ' +
+                           'aria-label="Slide ' + (index + 1) + ' of ' + xfContents.length + '" ' +
+                           'data-cmp-hook-carousel="item">' +
+                           '<div class="cmp-carousel__xf-item">' + content + '</div>' +
+                           '</div>';
+        });
+
+        carouselHTML += '</div>';
+
+        if (xfContents.length > 1) {
+            carouselHTML += '<ol class="cmp-carousel__indicators">';
+            xfContents.forEach(function(content, index) {
+                var isActive = index === 0;
+                carouselHTML += '<li class="cmp-carousel__indicator' + (isActive ? ' cmp-carousel__indicator--active' : '') + '" ' +
+                               'role="tab" ' +
+                               'aria-label="Slide ' + (index + 1) + '" ' +
+                               'aria-selected="' + isActive + '" ' +
+                               'tabindex="' + (isActive ? '0' : '-1') + '" ' +
+                               'data-cmp-hook-carousel="indicator"></li>';
+            });
+            carouselHTML += '</ol>';
+
+            carouselHTML += '<div class="cmp-carousel__actions">' +
+                           '<button class="cmp-carousel__action cmp-carousel__action--previous" type="button" aria-label="Previous" data-cmp-hook-carousel="previous">' +
+                           '<span class="cmp-carousel__action-icon" aria-hidden="true"></span>' +
+                           '<span class="cmp-carousel__action-text">Previous</span>' +
+                           '</button>' +
+                           '<button class="cmp-carousel__action cmp-carousel__action--next" type="button" aria-label="Next" data-cmp-hook-carousel="next">' +
+                           '<span class="cmp-carousel__action-icon" aria-hidden="true"></span>' +
+                           '<span class="cmp-carousel__action-text">Next</span>' +
+                           '</button>' +
+                           '</div>';
+        }
+
+        container.innerHTML = carouselHTML;
+        container.setAttribute('data-cmp-is', 'carousel');
+        container.setAttribute('data-cmp-delay', '5000');
+
+        console.log('Dynamic XF Carousel built with ' + xfContents.length + ' items');
+
+        if (xfContents.length > 1) {
+            initSimpleCarousel(container);
+        }
+    }
+
+    function initSimpleCarousel(container) {
+        var items = container.querySelectorAll('.cmp-carousel__item');
+        var indicators = container.querySelectorAll('.cmp-carousel__indicator');
+        var prevBtn = container.querySelector('[data-cmp-hook-carousel="previous"]');
+        var nextBtn = container.querySelector('[data-cmp-hook-carousel="next"]');
+        var currentIndex = 0;
+
+        function showSlide(index) {
+            items.forEach(function(item) {
+                item.classList.remove('cmp-carousel__item--active');
+            });
+
+            indicators.forEach(function(indicator) {
+                indicator.classList.remove('cmp-carousel__indicator--active');
+                indicator.setAttribute('aria-selected', 'false');
+                indicator.setAttribute('tabindex', '-1');
+            });
+
+            items[index].classList.add('cmp-carousel__item--active');
+
+            if (indicators[index]) {
+                indicators[index].classList.add('cmp-carousel__indicator--active');
+                indicators[index].setAttribute('aria-selected', 'true');
+                indicators[index].setAttribute('tabindex', '0');
+            }
+
+            currentIndex = index;
+        }
+
+        function nextSlide() {
+            var next = (currentIndex + 1) % items.length;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            var prev = (currentIndex - 1 + items.length) % items.length;
+            showSlide(prev);
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', nextSlide);
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', prevSlide);
+        }
+
+        indicators.forEach(function(indicator, index) {
+            indicator.addEventListener('click', function() {
+                showSlide(index);
+            });
+        });
+
+        var autoplayInterval = setInterval(nextSlide, 5000);
+
+        container.addEventListener('mouseenter', function() {
+            clearInterval(autoplayInterval);
+        });
+
+        container.addEventListener('mouseleave', function() {
+            autoplayInterval = setInterval(nextSlide, 5000);
+        });
+
+        console.log('Simple carousel initialized with ' + items.length + ' slides');
+    }
+
+    function showError(container, message) {
+        container.innerHTML = '<div class="cmp-carousel__error"><p>' + message + '</p></div>';
+    }
+})();
+</script>
