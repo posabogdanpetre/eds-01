@@ -1,7 +1,7 @@
 /**
- * LLMApps SDK — Lightweight bridge for the LLM Apps protocol.
+ * LLMApps SDK — Lightweight connector for the LLM Apps protocol.
  *
- * Implements the ui/* JSON-RPC 2.0 over postMessage bridge between
+ * Implements the ui/* JSON-RPC 2.0 over postMessage channel between
  * a widget (iframe) and its host (ChatGPT, Claude, VS Code, etc.).
  *
  * Zero dependencies. Works in any browser context.
@@ -10,33 +10,33 @@
  * Ref:   https://developers.openai.com/apps-sdk/reference
  *
  * ── Standard protocol ──────────────────────────────────────────
- *   ui/initialize                       → bridge.connect()
+ *   ui/initialize                       → app.connect()
  *   ui/notifications/initialized        → (automatic after connect)
- *   ui/notifications/tool-result        → bridge.toolResult   (Promise)
- *   ui/notifications/tool-input         → bridge.toolInput    (Promise)
- *   ui/notifications/tool-cancelled     → bridge.toolCancelled (Promise)
- *   ui/notifications/tool-input-partial → bridge.onToolInputPartial(cb)
- *   ui/notifications/host-context-changed → bridge.onContextChange(cb)
+ *   ui/notifications/tool-result        → app.toolResult   (Promise)
+ *   ui/notifications/tool-input         → app.toolInput    (Promise)
+ *   ui/notifications/tool-cancelled     → app.toolCancelled (Promise)
+ *   ui/notifications/tool-input-partial → app.onToolInputPartial(cb)
+ *   ui/notifications/host-context-changed → app.onContextChange(cb)
  *   ui/resource-teardown                → auto-respond + destroy
- *   tools/call                          → bridge.callTool(name, args)
- *   resources/read                      → bridge.readResource(uri)
- *   notifications/message               → bridge.log(level, message)
- *   ui/message                          → bridge.sendMessage(text)
- *   ui/update-model-context             → bridge.updateModelContext(text)
- *   ui/open-link                        → bridge.openLink(url)
- *   ui/request-display-mode             → bridge.requestDisplayMode(mode)
- *   ui/notifications/size-changed       → bridge.reportSize(w, h)
- *                                         bridge.autoResize(target?)
+ *   tools/call                          → app.callTool(name, args)
+ *   resources/read                      → app.readResource(uri)
+ *   notifications/message               → app.log(level, message)
+ *   ui/message                          → app.sendMessage(text)
+ *   ui/update-model-context             → app.updateModelContext(text)
+ *   ui/open-link                        → app.openLink(url)
+ *   ui/request-display-mode             → app.requestDisplayMode(mode)
+ *   ui/notifications/size-changed       → app.reportSize(w, h)
+ *                                         app.autoResize(target?)
  *
  * ── Host context (from ui/initialize result) ───────────────────
- *   bridge.hostContext          → theme, styles, locale, displayMode, ...
- *   bridge.hostCapabilities     → openLinks, serverTools, logging, ...
- *   bridge.hostInfo             → { name, version }
- *   bridge.applyHostStyles()    → inject CSS variables + fonts
- *   bridge.applyContainerDimensions() → apply sizing CSS
+ *   app.hostContext          → theme, styles, locale, displayMode, ...
+ *   app.hostCapabilities     → openLinks, serverTools, logging, ...
+ *   app.hostInfo             → { name, version }
+ *   app.applyHostStyles()    → inject CSS variables + fonts
+ *   app.applyContainerDimensions() → apply sizing CSS
  *
  * ── Vendor extensions (auto-detected) ──────────────────────────
- *   bridge.chatgpt              → ChatGPT-only APIs (or null)
+ *   app.chatgpt              → ChatGPT-only APIs (or null)
  *     .widgetState / .setWidgetState(state)
  *     .uploadFile(file) / .getFileDownloadUrl({ fileId })
  *     .requestModal(opts) / .requestClose() / .requestCheckout(opts)
@@ -45,24 +45,24 @@
  * @example
  *   import { LLMAppsSDK } from './llmapps-sdk.js';
  *
- *   const bridge = new LLMAppsSDK({
+ *   const app = new LLMAppsSDK({
  *     appInfo: { name: 'ProductShowcase', version: '1.0.0' },
  *     appCapabilities: { availableDisplayModes: ['inline', 'fullscreen'] },
  *   });
- *   await bridge.connect();
+ *   await app.connect();
  *
  *   // Host context (standard — works everywhere)
- *   console.log(bridge.hostContext.theme);   // 'dark'
- *   console.log(bridge.hostContext.locale);  // 'en-US'
- *   bridge.applyHostStyles();               // inject CSS variables
+ *   console.log(app.hostContext.theme);   // 'dark'
+ *   console.log(app.hostContext.locale);  // 'en-US'
+ *   app.applyHostStyles();               // inject CSS variables
  *
  *   // React to context changes (standard)
- *   bridge.onContextChange(ctx => {
+ *   app.onContextChange(ctx => {
  *     document.body.dataset.theme = ctx.theme;
  *   });
  *
  *   // Tool data
- *   const result = await bridge.toolResult;
+ *   const result = await app.toolResult;
  *   renderUI(result.structuredContent);
  */
 
@@ -79,7 +79,7 @@ const LOG_PREFIX = '[LLMApps]';
  * Thin wrapper around ChatGPT's `window.openai` runtime.
  * Only exposes capabilities with no standard equivalent.
  *
- * @private — accessed via `bridge.chatgpt`, never instantiated directly.
+ * @private — accessed via `app.chatgpt`, never instantiated directly.
  */
 class ChatGPTExtensions {
   /** @param {object} api — reference to `window.openai` */
@@ -169,7 +169,7 @@ export class LLMAppsSDK {
    *   @param {object} [options.appCapabilities.experimental]
    *
    * @example
-   *   const bridge = new LLMAppsSDK({
+   *   const app = new LLMAppsSDK({
    *     appInfo: { name: 'ProductShowcase', version: '1.0.0' },
    *     appCapabilities: {
    *       availableDisplayModes: ['inline', 'fullscreen'],
@@ -322,13 +322,13 @@ export class LLMAppsSDK {
    * @returns {Promise<LLMAppsSDK>} this instance (for chaining)
    */
   async connect() {
-    if (this._destroyed) throw new Error(`${LOG_PREFIX} Bridge is destroyed`);
+    if (this._destroyed) throw new Error(`${LOG_PREFIX} SDK instance is destroyed`);
 
     this._startListening();
 
     if (!this.isEmbedded) {
       // eslint-disable-next-line no-console
-      console.log(`${LOG_PREFIX} Not in iframe — bridge in standalone mode`);
+      console.log(`${LOG_PREFIX} Not in iframe — running in standalone mode`);
       return this;
     }
 
@@ -372,7 +372,7 @@ export class LLMAppsSDK {
       window.removeEventListener('message', this._messageHandler);
       this._messageHandler = null;
     }
-    this._pendingRequests.forEach(({ reject }) => reject(new Error('Bridge destroyed')));
+    this._pendingRequests.forEach(({ reject }) => reject(new Error('SDK instance destroyed')));
     this._pendingRequests.clear();
   }
 
@@ -457,7 +457,7 @@ export class LLMAppsSDK {
 
   /**
    * Send a log message to the host.
-   * Requires `bridge.hostCapabilities.logging` to be present.
+   * Requires `app.hostCapabilities.logging` to be present.
    *
    * @param {'debug'|'info'|'warning'|'error'} level - Log level
    * @param {string} message - Log message
@@ -533,7 +533,7 @@ export class LLMAppsSDK {
    * @returns {function} unsubscribe — call it to stop listening
    *
    * @example
-   *   const stop = bridge.onContextChange(ctx => {
+   *   const stop = app.onContextChange(ctx => {
    *     document.body.dataset.theme = ctx.theme;
    *     if (ctx.displayMode === 'fullscreen') showExpandedLayout();
    *   });
@@ -559,7 +559,7 @@ export class LLMAppsSDK {
    * @returns {function} unsubscribe
    *
    * @example
-   *   const stop = bridge.onToolInputPartial((params) => {
+   *   const stop = app.onToolInputPartial((params) => {
    *     if (params.arguments?.title) showTitle(params.arguments.title);
    *   });
    */
@@ -792,23 +792,23 @@ export class LLMAppsSDK {
 // ---------------------------------------------------------------
 
 /**
- * Create and connect a bridge in one call.
+ * Create and connect an app in one call.
  *
  * @param {object} options — same options as `new LLMAppsSDK(options)`
  *
  * @example
- *   const bridge = await createBridge({
+ *   const app = await createApp({
  *     appInfo: { name: 'MyApp', version: '1.0.0' },
  *     appCapabilities: { availableDisplayModes: ['inline', 'fullscreen'] },
  *   });
- *   const result = await bridge.toolResult;
+ *   const result = await app.toolResult;
  *
  * @returns {Promise<LLMAppsSDK>}
  */
-export async function createBridge(options) {
-  const bridge = new LLMAppsSDK(options);
-  await bridge.connect();
-  return bridge;
+export async function createApp(options) {
+  const app = new LLMAppsSDK(options);
+  await app.connect();
+  return app;
 }
 
 export default LLMAppsSDK;
