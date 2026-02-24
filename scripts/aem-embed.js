@@ -16,7 +16,7 @@
  *   - bridge.isEmbedded              → true if inside a host iframe
  */
 
-import { LLMAppsBridge } from './llmapps-sdk.js';
+import { LLMAppsSDK } from './llmapps-sdk.js';
 
 // eslint-disable-next-line import/prefer-default-export
 export class AEMEmbed extends HTMLElement {
@@ -31,7 +31,7 @@ export class AEMEmbed extends HTMLElement {
     [window.hlx.codeBasePath] = new URL(import.meta.url).pathname.split('/scripts/');
 
     // Create the bridge instance — shared by all blocks in this embed
-    this._bridge = new LLMAppsBridge({
+    this._bridge = new LLMAppsSDK({
       appInfo: { name: 'AEMEmbed', version: '1.0.0' },
       appCapabilities: {
         availableDisplayModes: ['inline', 'fullscreen'],

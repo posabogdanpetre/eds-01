@@ -40,7 +40,7 @@
  * ─────────────────────────────────────────────────────────────────────
  *
  * @param {HTMLElement} block  - The block DOM element
- * @param {LLMAppsBridge} bridge - The LLM Apps bridge instance
+ * @param {LLMAppsSDK} bridge - The LLM Apps bridge instance
  *
  * Expected structuredContent:
  * {

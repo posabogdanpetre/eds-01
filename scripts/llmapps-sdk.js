@@ -43,9 +43,9 @@
  *     .setOpenInAppUrl(opts) / .view
  *
  * @example
- *   import { LLMAppsBridge } from './llmapps-sdk.js';
+ *   import { LLMAppsSDK } from './llmapps-sdk.js';
  *
- *   const bridge = new LLMAppsBridge({
+ *   const bridge = new LLMAppsSDK({
  *     appInfo: { name: 'ProductShowcase', version: '1.0.0' },
  *     appCapabilities: { availableDisplayModes: ['inline', 'fullscreen'] },
  *   });
@@ -154,9 +154,9 @@ class ChatGPTExtensions {
 }
 
 // ---------------------------------------------------------------
-// LLMAppsBridge
+// LLMAppsSDK
 // ---------------------------------------------------------------
-export class LLMAppsBridge {
+export class LLMAppsSDK {
   /**
    * @param {object} options
    * @param {{ name: string, version: string }} options.appInfo
@@ -169,7 +169,7 @@ export class LLMAppsBridge {
    *   @param {object} [options.appCapabilities.experimental]
    *
    * @example
-   *   const bridge = new LLMAppsBridge({
+   *   const bridge = new LLMAppsSDK({
    *     appInfo: { name: 'ProductShowcase', version: '1.0.0' },
    *     appCapabilities: {
    *       availableDisplayModes: ['inline', 'fullscreen'],
@@ -319,7 +319,7 @@ export class LLMAppsBridge {
    *
    * Safe to call when not embedded (returns immediately, isConnected = false).
    *
-   * @returns {Promise<LLMAppsBridge>} this instance (for chaining)
+   * @returns {Promise<LLMAppsSDK>} this instance (for chaining)
    */
   async connect() {
     if (this._destroyed) throw new Error(`${LOG_PREFIX} Bridge is destroyed`);
@@ -794,7 +794,7 @@ export class LLMAppsBridge {
 /**
  * Create and connect a bridge in one call.
  *
- * @param {object} options — same options as `new LLMAppsBridge(options)`
+ * @param {object} options — same options as `new LLMAppsSDK(options)`
  *
  * @example
  *   const bridge = await createBridge({
@@ -803,12 +803,12 @@ export class LLMAppsBridge {
  *   });
  *   const result = await bridge.toolResult;
  *
- * @returns {Promise<LLMAppsBridge>}
+ * @returns {Promise<LLMAppsSDK>}
  */
 export async function createBridge(options) {
-  const bridge = new LLMAppsBridge(options);
+  const bridge = new LLMAppsSDK(options);
   await bridge.connect();
   return bridge;
 }
 
-export default LLMAppsBridge;
+export default LLMAppsSDK;
