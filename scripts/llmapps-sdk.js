@@ -43,9 +43,9 @@
  *     .setOpenInAppUrl(opts) / .view
  *
  * @example
- *   import { LLMAppsSDK } from './llmapps-sdk.js';
+ *   import { LLMApp } from './llmapps-sdk.js';
  *
- *   const app = new LLMAppsSDK({
+ *   const app = new LLMApp({
  *     appInfo: { name: 'ProductShowcase', version: '1.0.0' },
  *     appCapabilities: { availableDisplayModes: ['inline', 'fullscreen'] },
  *   });
@@ -154,9 +154,9 @@ class ChatGPTExtensions {
 }
 
 // ---------------------------------------------------------------
-// LLMAppsSDK
+// LLMApp
 // ---------------------------------------------------------------
-export class LLMAppsSDK {
+export class LLMApp {
   /**
    * @param {object} options
    * @param {{ name: string, version: string }} options.appInfo
@@ -169,7 +169,7 @@ export class LLMAppsSDK {
    *   @param {object} [options.appCapabilities.experimental]
    *
    * @example
-   *   const app = new LLMAppsSDK({
+   *   const app = new LLMApp({
    *     appInfo: { name: 'ProductShowcase', version: '1.0.0' },
    *     appCapabilities: {
    *       availableDisplayModes: ['inline', 'fullscreen'],
@@ -319,7 +319,7 @@ export class LLMAppsSDK {
    *
    * Safe to call when not embedded (returns immediately, isConnected = false).
    *
-   * @returns {Promise<LLMAppsSDK>} this instance (for chaining)
+   * @returns {Promise<LLMApp>} this instance (for chaining)
    */
   async connect() {
     if (this._destroyed) throw new Error(`${LOG_PREFIX} SDK instance is destroyed`);
@@ -794,7 +794,7 @@ export class LLMAppsSDK {
 /**
  * Create and connect an app in one call.
  *
- * @param {object} options — same options as `new LLMAppsSDK(options)`
+ * @param {object} options — same options as `new LLMApp(options)`
  *
  * @example
  *   const app = await createApp({
@@ -803,12 +803,12 @@ export class LLMAppsSDK {
  *   });
  *   const result = await app.toolResult;
  *
- * @returns {Promise<LLMAppsSDK>}
+ * @returns {Promise<LLMApp>}
  */
 export async function createApp(options) {
-  const app = new LLMAppsSDK(options);
+  const app = new LLMApp(options);
   await app.connect();
   return app;
 }
 
-export default LLMAppsSDK;
+export default LLMApp;
