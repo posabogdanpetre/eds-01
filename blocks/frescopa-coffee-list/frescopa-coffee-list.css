@@ -72,6 +72,7 @@
   flex-direction: column;
   gap: 8px;
   text-align: left;
+  flex-grow: 1;
 }
 
 .coffee-title {
@@ -110,7 +111,7 @@
   border: none;
   border-radius: 6px;
   padding: 10px 16px;
-  margin-top: 8px;
+  margin-top: auto;
   cursor: pointer;
   transition: background 0.2s ease;
 }

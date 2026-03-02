@@ -32,7 +32,7 @@ function createCoffeeCard(coffee, bridge) {
 
   const detailsBtn = document.createElement('button');
   detailsBtn.className = 'coffee-details-btn';
-  detailsBtn.textContent = 'View Details';
+  detailsBtn.textContent = 'Tell me more';
   detailsBtn.addEventListener('click', () => {
     if (bridge) {
       bridge.sendMessage(`Show me details for coffee ${coffee.id}`);
