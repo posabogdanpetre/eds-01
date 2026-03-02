@@ -120,6 +120,14 @@
   background: #4a1515;
 }
 
+.coffee-details-btn:focus,
+.coffee-details-btn:active,
+.coffee-details-btn:visited {
+  color: #fff;
+  background: #6b1f1f;
+  outline: none;
+}
+
 .no-coffee {
   text-align: center;
   padding: 40px;
