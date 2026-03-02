@@ -1,4 +1,4 @@
-function createCoffeeCard(coffee) {
+function createCoffeeCard(coffee, bridge) {
   const card = document.createElement('div');
   card.className = 'coffee-card';
 
@@ -30,9 +30,19 @@ function createCoffeeCard(coffee) {
   price.className = 'coffee-price';
   price.textContent = coffee.price;
 
+  const detailsBtn = document.createElement('button');
+  detailsBtn.className = 'coffee-details-btn';
+  detailsBtn.textContent = 'View Details';
+  detailsBtn.addEventListener('click', () => {
+    if (bridge) {
+      bridge.sendMessage(`Show me details for coffee ${coffee.id}`);
+    }
+  });
+
   body.appendChild(title);
   body.appendChild(description);
   body.appendChild(price);
+  body.appendChild(detailsBtn);
   card.appendChild(body);
 
   return card;
@@ -98,7 +108,7 @@ export default async function decorate(block, bridge) {
     container.className = 'coffee-container';
 
     data.coffee.forEach((coffee) => {
-      const card = createCoffeeCard(coffee);
+      const card = createCoffeeCard(coffee, bridge);
       container.appendChild(card);
     });
 
