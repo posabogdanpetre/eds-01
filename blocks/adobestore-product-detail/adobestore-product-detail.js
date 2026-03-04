@@ -109,21 +109,25 @@ export default async function decorate(block, bridge) {
   }
 
   try {
+    console.log('[ProductDetail] waiting for toolResult...');
     const result = await bridge.toolResult;
+    console.log('[ProductDetail] toolResult received:', JSON.stringify(result).slice(0, 500));
     const data = result?.structuredContent || result;
+    console.log('[ProductDetail] data.product:', data?.product ? 'exists' : 'MISSING');
 
     block.textContent = '';
 
     if (!data || !data.product) {
       block.innerHTML = '<p class="adobestore-detail-empty">Product not found.</p>';
+      console.log('[ProductDetail] No product in data, keys:', Object.keys(data || {}));
       return;
     }
 
     const detailView = createDetailView(data.product, bridge);
     block.appendChild(detailView);
+    console.log('[ProductDetail] rendered successfully');
   } catch (error) {
     block.textContent = 'Error loading product details';
-    // eslint-disable-next-line no-console
-    console.error('Error loading Adobe Store product detail:', error);
+    console.error('[ProductDetail] Error:', error);
   }
 }
