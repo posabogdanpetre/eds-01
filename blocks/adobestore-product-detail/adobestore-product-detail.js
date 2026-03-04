@@ -2,16 +2,38 @@ function createDetailView(product, bridge) {
   const container = document.createElement('div');
   container.className = 'adobestore-detail';
 
-  // Image section
   const imageSection = document.createElement('div');
   imageSection.className = 'adobestore-detail-image-section';
 
-  if (product.imageUrl) {
-    const img = document.createElement('img');
-    img.src = product.imageUrl;
-    img.alt = product.name;
-    img.className = 'adobestore-detail-image';
-    imageSection.appendChild(img);
+  const images = product.allImages && product.allImages.length > 0
+    ? product.allImages
+    : (product.imageUrl ? [product.imageUrl] : []);
+
+  if (images.length > 0) {
+    const mainImg = document.createElement('img');
+    mainImg.src = images[0];
+    mainImg.alt = product.name;
+    mainImg.className = 'adobestore-detail-image';
+    imageSection.appendChild(mainImg);
+
+    if (images.length > 1) {
+      const thumbs = document.createElement('div');
+      thumbs.className = 'adobestore-detail-thumbs';
+      images.forEach((url, i) => {
+        const thumb = document.createElement('img');
+        thumb.src = url;
+        thumb.alt = `${product.name} - ${i + 1}`;
+        thumb.className = 'adobestore-detail-thumb';
+        if (i === 0) thumb.classList.add('active');
+        thumb.addEventListener('click', () => {
+          mainImg.src = url;
+          thumbs.querySelectorAll('.adobestore-detail-thumb').forEach((t) => t.classList.remove('active'));
+          thumb.classList.add('active');
+        });
+        thumbs.appendChild(thumb);
+      });
+      imageSection.appendChild(thumbs);
+    }
   }
   container.appendChild(imageSection);
 
@@ -109,25 +131,21 @@ export default async function decorate(block, bridge) {
   }
 
   try {
-    console.log('[ProductDetail] waiting for toolResult...');
     const result = await bridge.toolResult;
-    console.log('[ProductDetail] toolResult received:', JSON.stringify(result).slice(0, 500));
     const data = result?.structuredContent || result;
-    console.log('[ProductDetail] data.product:', data?.product ? 'exists' : 'MISSING');
 
     block.textContent = '';
 
     if (!data || !data.product) {
       block.innerHTML = '<p class="adobestore-detail-empty">Product not found.</p>';
-      console.log('[ProductDetail] No product in data, keys:', Object.keys(data || {}));
       return;
     }
 
     const detailView = createDetailView(data.product, bridge);
     block.appendChild(detailView);
-    console.log('[ProductDetail] rendered successfully');
   } catch (error) {
     block.textContent = 'Error loading product details';
-    console.error('[ProductDetail] Error:', error);
+    // eslint-disable-next-line no-console
+    console.error('Error loading Adobe Store product detail:', error);
   }
 }

@@ -17,14 +17,11 @@
 }
 
 .adobestore-detail-image-section {
-  flex: 0 0 280px;
-  background: #f8f8f8;
-  border-radius: 12px;
+  flex: 0 0 300px;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
-  box-sizing: border-box;
 }
 
 .adobestore-detail-image {
@@ -32,6 +29,40 @@
   height: auto;
   max-height: 320px;
   object-fit: contain;
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.adobestore-detail-thumbs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.adobestore-detail-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
+  opacity: 0.6;
+}
+
+.adobestore-detail-thumb:hover {
+  opacity: 1;
+}
+
+.adobestore-detail-thumb.active {
+  border-color: #eb1000;
+  opacity: 1;
 }
 
 .adobestore-detail-info {
@@ -178,7 +209,7 @@
   .adobestore-detail-image-section {
     flex: none;
     width: 100%;
-    max-width: 240px;
+    max-width: 260px;
     margin: 0 auto;
   }
 
