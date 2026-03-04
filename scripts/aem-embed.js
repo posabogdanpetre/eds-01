@@ -128,12 +128,18 @@ export class AEMEmbed extends HTMLElement {
     body.append(main);
     main.innerHTML = htmlText;
 
+    console.log('[AEM Embed] importing scripts.js from:', `${origin}${window.hlx.codeBasePath}/scripts/scripts.js`);
     const { decorateMain } = await import(`${origin}${window.hlx.codeBasePath}/scripts/scripts.js`);
     if (decorateMain) {
+      console.log('[AEM Embed] calling decorateMain...');
       await decorateMain(main, true);
+      console.log('[AEM Embed] decorateMain done');
+    } else {
+      console.log('[AEM Embed] decorateMain not exported from scripts.js');
     }
 
     const blockElements = main.querySelectorAll('.block');
+    console.log('[AEM Embed] found blocks:', blockElements.length, Array.from(blockElements).map((b) => b.classList.item(0)));
 
     if (blockElements.length > 0) {
       const blocks = Array.from(blockElements).map((block) => block.classList.item(0));
@@ -141,8 +147,10 @@ export class AEMEmbed extends HTMLElement {
       for (let i = 0; i < blockElements.length; i += 1) {
         const blockName = blocks[i];
         const block = blockElements[i];
+        console.log('[AEM Embed] loading block:', blockName);
         // eslint-disable-next-line no-await-in-loop
         await this.loadBlock(body, block, blockName, origin);
+        console.log('[AEM Embed] block loaded:', blockName);
       }
     }
 
@@ -184,7 +192,9 @@ export class AEMEmbed extends HTMLElement {
         const bridgeReady = this._bridge.connect();
 
         // Load fragment
+        console.log('[AEM Embed] fetching', href);
         const resp = await fetch(href);
+        console.log('[AEM Embed] fetch status:', resp.status);
         if (!resp.ok) {
           throw new Error(`Unable to fetch ${href}`);
         }
@@ -203,7 +213,9 @@ export class AEMEmbed extends HTMLElement {
         this.initialized = true;
 
         // Wait for bridge before loading blocks
+        console.log('[AEM Embed] waiting for bridge...');
         await bridgeReady;
+        console.log('[AEM Embed] bridge ready, handling type:', type);
 
         if (type === 'main') await this.handleMain(htmlText, body, origin);
         if (type === 'header') await this.handleHeader(htmlText, body, origin);
