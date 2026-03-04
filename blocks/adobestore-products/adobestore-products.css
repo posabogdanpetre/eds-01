@@ -122,40 +122,48 @@
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  padding: 9px 20px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
   text-align: center;
   display: inline-block;
-  line-height: 1.4;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .adobestore-btn-details {
   color: #1a1a1a;
-  background: #f0f0f0;
+  background: transparent;
+  border-color: #d0d0d0;
+  flex: 1;
 }
 
 .adobestore-btn-details:hover {
-  background: #e0e0e0;
+  background: #f5f5f5;
+  border-color: #1a1a1a;
 }
 
 .adobestore-btn-details:focus,
 .adobestore-btn-details:active {
   color: #1a1a1a;
-  background: #e0e0e0;
+  background: #f5f5f5;
   outline: none;
 }
 
 .adobestore-btn-buy {
   color: #fff;
   background: #eb1000;
+  border-color: #eb1000;
+  flex: 1;
 }
 
 .adobestore-btn-buy:hover {
   background: #c80d00;
+  border-color: #c80d00;
 }
 
 .adobestore-btn-buy:focus,

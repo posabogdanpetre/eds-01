@@ -205,10 +205,6 @@ export class AEMEmbed extends HTMLElement {
         // Wait for bridge before loading blocks
         await bridgeReady;
 
-        // Apply host-provided CSS variables and fonts (if available)
-        this._bridge.applyHostStyles(this.shadowRoot.host);
-        this._bridge.applyContainerDimensions(this.shadowRoot.host);
-
         if (type === 'main') await this.handleMain(htmlText, body, origin);
         if (type === 'header') await this.handleHeader(htmlText, body, origin);
         if (type === 'footer') await this.handleFooter(htmlText, body, origin);

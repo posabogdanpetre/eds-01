@@ -754,13 +754,17 @@ export class LLMApp {
       }
 
       if (msg.method === 'ui/notifications/host-context-changed') {
-        // eslint-disable-next-line no-console
-        console.log(`${LOG_PREFIX} host-context-changed received`);
-        // Merge partial update into hostContext
         if (msg.params && typeof msg.params === 'object') {
+          // Skip if the incoming context is identical to what we already have
+          const dominated = Object.keys(msg.params).every(
+            (k) => JSON.stringify(this._hostContext[k]) === JSON.stringify(msg.params[k]),
+          );
+          if (dominated) return;
+
+          // eslint-disable-next-line no-console
+          console.log(`${LOG_PREFIX} host-context-changed received`);
           Object.assign(this._hostContext, msg.params);
         }
-        // Fire callbacks with the merged context
         this._contextChangeCallbacks.forEach((fn) => {
           try { fn(this._hostContext); } catch { /* consumer error */ }
         });
