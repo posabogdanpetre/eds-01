@@ -1,6 +1,15 @@
+const ARROW_SVG = '<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 1.5L8 6l-4.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
 function createProductCard(product, bridge) {
   const card = document.createElement('div');
   card.className = 'adobestore-card';
+
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.adobestore-card-shop')) return;
+    if (bridge) {
+      bridge.sendMessage(`Show me details for Adobe Store product ${product.sku}`);
+    }
+  });
 
   const imageContainer = document.createElement('div');
   imageContainer.className = 'adobestore-card-image';
@@ -24,42 +33,33 @@ function createProductCard(product, bridge) {
   desc.className = 'adobestore-card-desc';
   desc.textContent = product.shortDescription || '';
 
-  const price = document.createElement('div');
+  const footer = document.createElement('div');
+  footer.className = 'adobestore-card-footer';
+
+  const price = document.createElement('span');
   price.className = 'adobestore-card-price';
   price.textContent = product.price;
 
-  const actions = document.createElement('div');
-  actions.className = 'adobestore-card-actions';
-
-  const detailsBtn = document.createElement('button');
-  detailsBtn.className = 'adobestore-btn adobestore-btn-details';
-  detailsBtn.textContent = 'Tell me more';
-  detailsBtn.addEventListener('click', () => {
-    if (bridge) {
-      bridge.sendMessage(`Show me details for Adobe Store product ${product.sku}`);
-    }
-  });
-
-  const buyLink = document.createElement('a');
-  buyLink.className = 'adobestore-btn adobestore-btn-buy';
-  buyLink.textContent = 'Buy';
-  buyLink.href = product.productUrl || '#';
-  buyLink.target = '_blank';
-  buyLink.rel = 'noopener noreferrer';
-  buyLink.addEventListener('click', (e) => {
+  const shopLink = document.createElement('a');
+  shopLink.className = 'adobestore-card-shop';
+  shopLink.href = product.productUrl || '#';
+  shopLink.target = '_blank';
+  shopLink.rel = 'noopener noreferrer';
+  shopLink.innerHTML = 'Shop &#8599;';
+  shopLink.addEventListener('click', (e) => {
+    e.stopPropagation();
     if (bridge && bridge.openLink) {
       e.preventDefault();
       bridge.openLink(product.productUrl);
     }
   });
 
-  actions.appendChild(detailsBtn);
-  actions.appendChild(buyLink);
+  footer.appendChild(price);
+  footer.appendChild(shopLink);
 
   body.appendChild(title);
   body.appendChild(desc);
-  body.appendChild(price);
-  body.appendChild(actions);
+  body.appendChild(footer);
   card.appendChild(body);
 
   return card;
@@ -69,12 +69,13 @@ function createCarouselArrows(container, block) {
   const leftArrow = document.createElement('button');
   leftArrow.className = 'adobestore-arrow adobestore-arrow-left';
   leftArrow.setAttribute('aria-label', 'Previous products');
-  leftArrow.textContent = '\u2039';
+  leftArrow.innerHTML = ARROW_SVG;
+  leftArrow.style.transform = 'translateY(-50%) scaleX(-1)';
 
   const rightArrow = document.createElement('button');
   rightArrow.className = 'adobestore-arrow adobestore-arrow-right';
   rightArrow.setAttribute('aria-label', 'Next products');
-  rightArrow.textContent = '\u203A';
+  rightArrow.innerHTML = ARROW_SVG;
 
   const updateArrows = () => {
     const { scrollLeft } = container;
@@ -83,7 +84,7 @@ function createCarouselArrows(container, block) {
     rightArrow.classList.toggle('disabled', scrollLeft >= maxScroll - 1);
   };
 
-  const scrollAmount = 320;
+  const scrollAmount = 260;
 
   leftArrow.addEventListener('click', () => {
     container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });

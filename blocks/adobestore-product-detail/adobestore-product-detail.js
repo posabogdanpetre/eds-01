@@ -81,10 +81,9 @@ function createDetailView(product, bridge) {
     info.appendChild(fullDesc);
   }
 
-  // Buy button
   const buyLink = document.createElement('a');
   buyLink.className = 'adobestore-detail-buy';
-  buyLink.textContent = 'Buy on Adobe Store';
+  buyLink.innerHTML = 'Shop on Adobe Store &#8599;';
   buyLink.href = product.productUrl || '#';
   buyLink.target = '_blank';
   buyLink.rel = 'noopener noreferrer';
