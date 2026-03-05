@@ -108,17 +108,17 @@
 
 .adobestore-card-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-top: auto;
-  padding-top: 10px;
+  padding-top: 12px;
 }
 
 .adobestore-btn {
   flex: 1;
-  padding: 9px 0;
-  border-radius: 8px;
-  font-size: 12.5px;
-  font-weight: 700;
+  padding: 8px 0;
+  border-radius: 980px;
+  font-size: 12px;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   text-align: center;
@@ -126,45 +126,38 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  letter-spacing: 0.2px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  letter-spacing: 0.3px;
   line-height: 1;
   box-sizing: border-box;
 }
 
 .adobestore-btn-details {
-  background: #1a1a1a;
-  color: #fff;
-  border: 2px solid #1a1a1a;
+  background: transparent;
+  color: #505050;
+  border: 1px solid #d0d0d0;
 }
 
 .adobestore-btn-details:hover {
-  background: #333;
-  border-color: #333;
-}
-
-.adobestore-btn-details:active {
-  transform: scale(0.97);
+  background: #f5f5f5;
+  border-color: #b0b0b0;
+  color: #1a1a1a;
 }
 
 .adobestore-btn-buy {
-  background: #fff;
-  color: #eb1000;
-  border: 2px solid #eb1000;
+  background: #eb1000;
+  color: #fff;
+  border: 1px solid #eb1000;
 }
 
 .adobestore-btn-buy:hover {
-  background: #eb1000;
-  color: #fff;
-}
-
-.adobestore-btn-buy:active {
-  transform: scale(0.97);
+  background: #c80d00;
+  border-color: #c80d00;
 }
 
 .adobestore-btn-buy:visited,
 .adobestore-btn-buy:focus {
-  color: #eb1000;
+  color: #fff;
   outline: none;
 }
 
@@ -242,8 +235,8 @@
   }
 
   .adobestore-btn {
-    padding: 8px 0;
-    font-size: 11.5px;
+    padding: 7px 0;
+    font-size: 11px;
   }
 
   .adobestore-arrow {
