@@ -139,6 +139,14 @@
   color: #1473e6;
 }
 
+.adobestore-btn:active,
+.adobestore-btn:focus,
+.adobestore-btn:focus-visible {
+  background: #1473e6;
+  color: #fff;
+  border-color: #1473e6;
+}
+
 .adobestore-empty {
   text-align: center;
   padding: 40px;
