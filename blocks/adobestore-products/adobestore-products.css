@@ -37,29 +37,28 @@
 
 .adobestore-card {
   background: #fff;
-  border-radius: 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 14px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
-  min-width: 220px;
-  max-width: 220px;
+  min-width: 230px;
+  max-width: 230px;
   flex-shrink: 0;
   box-sizing: border-box;
   overflow: hidden;
-  cursor: pointer;
-  border: 1px solid #eee;
+  border: 1px solid #ebebeb;
 }
 
 .adobestore-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 28px rgb(0 0 0 / 8%);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 10%);
 }
 
 .adobestore-card-image {
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  background: #f8f8f8;
+  background: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,87 +69,108 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: transform 0.35s ease;
-  padding: 12px;
+  transition: transform 0.4s ease;
+  padding: 16px;
   box-sizing: border-box;
 }
 
 .adobestore-card:hover .adobestore-card-image img {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
 .adobestore-card-body {
-  padding: 14px 14px 16px;
+  padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   flex-grow: 1;
 }
 
 .adobestore-card-title {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #1a1a1a;
   margin: 0;
-  line-height: 1.35;
-}
-
-.adobestore-card-desc {
-  font-size: 12px;
-  color: #888;
-  margin: 0;
-  line-height: 1.45;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.adobestore-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 6px;
-}
-
 .adobestore-card-price {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   color: #1a1a1a;
-  margin: 0;
+  margin: 2px 0 0;
+  letter-spacing: -0.3px;
 }
 
-.adobestore-card-shop {
-  font-size: 12px;
-  font-weight: 600;
-  color: #eb1000;
+.adobestore-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.adobestore-btn {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  transition: opacity 0.15s ease;
-  padding: 4px 0;
-  border: none;
-  background: none;
-  cursor: pointer;
+  justify-content: center;
+  transition: all 0.2s ease;
+  letter-spacing: 0.2px;
+  line-height: 1;
+  box-sizing: border-box;
 }
 
-.adobestore-card-shop:hover {
-  opacity: 0.7;
+.adobestore-btn-details {
+  background: #1a1a1a;
+  color: #fff;
+  border: 2px solid #1a1a1a;
 }
 
-.adobestore-card-shop:focus,
-.adobestore-card-shop:active,
-.adobestore-card-shop:visited {
+.adobestore-btn-details:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.adobestore-btn-details:active {
+  transform: scale(0.97);
+}
+
+.adobestore-btn-buy {
+  background: #fff;
+  color: #eb1000;
+  border: 2px solid #eb1000;
+}
+
+.adobestore-btn-buy:hover {
+  background: #eb1000;
+  color: #fff;
+}
+
+.adobestore-btn-buy:active {
+  transform: scale(0.97);
+}
+
+.adobestore-btn-buy:visited,
+.adobestore-btn-buy:focus {
   color: #eb1000;
   outline: none;
 }
 
-.adobestore-card-shop svg {
-  width: 12px;
-  height: 12px;
-  fill: currentColor;
+.adobestore-btn-buy:hover:visited,
+.adobestore-btn-buy:hover:focus {
+  color: #fff;
 }
 
 .adobestore-empty {
@@ -217,8 +237,13 @@
   }
 
   .adobestore-card {
-    min-width: 180px;
-    max-width: 180px;
+    min-width: 190px;
+    max-width: 190px;
+  }
+
+  .adobestore-btn {
+    padding: 8px 0;
+    font-size: 11.5px;
   }
 
   .adobestore-arrow {

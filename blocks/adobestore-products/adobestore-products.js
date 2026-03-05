@@ -4,13 +4,6 @@ function createProductCard(product, bridge) {
   const card = document.createElement('div');
   card.className = 'adobestore-card';
 
-  card.addEventListener('click', (e) => {
-    if (e.target.closest('.adobestore-card-shop')) return;
-    if (bridge) {
-      bridge.sendMessage(`Show me details for Adobe Store product ${product.sku}`);
-    }
-  });
-
   const imageContainer = document.createElement('div');
   imageContainer.className = 'adobestore-card-image';
   if (product.imageUrl) {
@@ -29,37 +22,41 @@ function createProductCard(product, bridge) {
   title.className = 'adobestore-card-title';
   title.textContent = product.name;
 
-  const desc = document.createElement('p');
-  desc.className = 'adobestore-card-desc';
-  desc.textContent = product.shortDescription || '';
+  const priceRow = document.createElement('div');
+  priceRow.className = 'adobestore-card-price';
+  priceRow.textContent = product.price;
 
-  const footer = document.createElement('div');
-  footer.className = 'adobestore-card-footer';
+  const actions = document.createElement('div');
+  actions.className = 'adobestore-card-actions';
 
-  const price = document.createElement('span');
-  price.className = 'adobestore-card-price';
-  price.textContent = product.price;
+  const detailsBtn = document.createElement('button');
+  detailsBtn.className = 'adobestore-btn adobestore-btn-details';
+  detailsBtn.textContent = 'More Details';
+  detailsBtn.addEventListener('click', () => {
+    if (bridge) {
+      bridge.sendMessage(`Show me details for Adobe Store product ${product.sku}`);
+    }
+  });
 
-  const shopLink = document.createElement('a');
-  shopLink.className = 'adobestore-card-shop';
-  shopLink.href = product.productUrl || '#';
-  shopLink.target = '_blank';
-  shopLink.rel = 'noopener noreferrer';
-  shopLink.innerHTML = 'Shop &#8599;';
-  shopLink.addEventListener('click', (e) => {
-    e.stopPropagation();
+  const buyBtn = document.createElement('a');
+  buyBtn.className = 'adobestore-btn adobestore-btn-buy';
+  buyBtn.href = product.productUrl || '#';
+  buyBtn.target = '_blank';
+  buyBtn.rel = 'noopener noreferrer';
+  buyBtn.textContent = 'Buy';
+  buyBtn.addEventListener('click', (e) => {
     if (bridge && bridge.openLink) {
       e.preventDefault();
       bridge.openLink(product.productUrl);
     }
   });
 
-  footer.appendChild(price);
-  footer.appendChild(shopLink);
+  actions.appendChild(detailsBtn);
+  actions.appendChild(buyBtn);
 
   body.appendChild(title);
-  body.appendChild(desc);
-  body.appendChild(footer);
+  body.appendChild(priceRow);
+  body.appendChild(actions);
   card.appendChild(body);
 
   return card;
