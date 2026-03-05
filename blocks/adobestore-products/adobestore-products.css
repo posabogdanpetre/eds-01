@@ -108,17 +108,17 @@
 
 .adobestore-card-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-top: auto;
   padding-top: 12px;
 }
 
 .adobestore-btn {
   flex: 1;
-  padding: 8px 0;
-  border-radius: 980px;
+  padding: 9px 0;
+  border-radius: 4px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   text-align: center;
@@ -126,44 +126,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  letter-spacing: 0.3px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   line-height: 1;
   box-sizing: border-box;
+  background: #fff;
+  color: #eb1000;
+  border: 1.5px solid #eb1000;
 }
 
-.adobestore-btn-details {
-  background: transparent;
-  color: #505050;
-  border: 1px solid #d0d0d0;
+.adobestore-btn:hover {
+  background: #fff;
+  color: #b30c00;
+  border-color: #b30c00;
 }
 
-.adobestore-btn-details:hover {
-  background: #f5f5f5;
-  border-color: #b0b0b0;
-  color: #1a1a1a;
-}
-
-.adobestore-btn-buy {
-  background: #eb1000;
-  color: #fff;
-  border: 1px solid #eb1000;
-}
-
-.adobestore-btn-buy:hover {
-  background: #c80d00;
-  border-color: #c80d00;
-}
-
-.adobestore-btn-buy:visited,
-.adobestore-btn-buy:focus {
-  color: #fff;
+.adobestore-btn:visited,
+.adobestore-btn:focus {
+  color: #eb1000;
   outline: none;
 }
 
-.adobestore-btn-buy:hover:visited,
-.adobestore-btn-buy:hover:focus {
-  color: #fff;
+.adobestore-btn:hover:visited,
+.adobestore-btn:hover:focus {
+  color: #b30c00;
 }
 
 .adobestore-empty {
@@ -235,7 +220,7 @@
   }
 
   .adobestore-btn {
-    padding: 7px 0;
+    padding: 8px 0;
     font-size: 11px;
   }
 
