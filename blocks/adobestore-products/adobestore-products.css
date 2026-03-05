@@ -128,15 +128,15 @@
   transition: background 0.15s ease, color 0.15s ease;
   line-height: 1;
   box-sizing: border-box;
-  background: #fff;
-  color: #1473e6;
+  background: #1473e6;
+  color: #fff;
   border: 1.5px solid #1473e6;
   outline: none;
 }
 
 .adobestore-btn:hover {
-  background: #1473e6;
-  color: #fff;
+  background: #fff;
+  color: #1473e6;
 }
 
 .adobestore-empty {
