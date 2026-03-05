@@ -395,17 +395,9 @@ export class LLMApp {
    * Note: spec shows content as a single ContentBlock, but hosts
    * (ChatGPT) validate it as an array. Using array for compatibility.
    * @param {string} text - Message text
-   * @param {Object} [options] - Optional settings
-   * @param {boolean} [options.scrollToBottom=true] - Auto-scroll to bottom after sending
    * @returns {Promise<Object>} Host response
    */
-  async sendMessage(text, options = {}) {
-    const { scrollToBottom = true } = options;
-
-    if (scrollToBottom && window.openai?.sendFollowUpMessage) {
-      return window.openai.sendFollowUpMessage({ prompt: text, scrollToBottom: true });
-    }
-
+  async sendMessage(text) {
     return this.request('ui/message', {
       role: 'user',
       content: [{ type: 'text', text }],
