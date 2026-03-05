@@ -115,7 +115,7 @@
 
 .adobestore-btn {
   flex: 1;
-  padding: 10px 0;
+  padding: 9px 0;
   border-radius: 980px;
   font-size: 12px;
   font-weight: 700;
@@ -125,17 +125,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   line-height: 1;
   box-sizing: border-box;
-  background: #eb1000;
-  color: #fff;
-  border: none;
+  background: #fff;
+  color: #1473e6;
+  border: 1.5px solid #1473e6;
   outline: none;
 }
 
 .adobestore-btn:hover {
-  background: #c80d00;
+  background: #1473e6;
+  color: #fff;
 }
 
 .adobestore-empty {
