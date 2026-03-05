@@ -134,14 +134,16 @@
   outline: none;
 }
 
-.adobestore-btn:hover {
+.adobestore-btn:hover,
+.adobestore-btn:focus:hover,
+.adobestore-btn:active:hover {
   background: #fff;
   color: #1473e6;
 }
 
-.adobestore-btn:active,
 .adobestore-btn:focus,
-.adobestore-btn:focus-visible {
+.adobestore-btn:focus-visible,
+.adobestore-btn:active {
   background: #1473e6;
   color: #fff;
   border-color: #1473e6;
