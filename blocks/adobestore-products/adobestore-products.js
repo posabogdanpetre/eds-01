@@ -38,16 +38,14 @@ function createProductCard(product, bridge) {
     }
   });
 
-  const buyBtn = document.createElement('a');
+  const buyBtn = document.createElement('button');
   buyBtn.className = 'adobestore-btn adobestore-btn-buy';
-  buyBtn.href = product.productUrl || '#';
-  buyBtn.target = '_blank';
-  buyBtn.rel = 'noopener noreferrer';
   buyBtn.textContent = 'Buy';
-  buyBtn.addEventListener('click', (e) => {
+  buyBtn.addEventListener('click', () => {
     if (bridge && bridge.openLink) {
-      e.preventDefault();
       bridge.openLink(product.productUrl);
+    } else {
+      window.open(product.productUrl, '_blank');
     }
   });
 
