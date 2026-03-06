@@ -1,14 +1,63 @@
+/* ================================================================
+   adobestore-product-detail — Spectrum 2 theme-aware detail view
+   ================================================================
+   Design tokens derived from Spectrum 2 color aliases:
+     Light: gray-25 → gray-900, accent/negative palettes
+     Dark:  inverted gray scale, adjusted accent/negative
+   ================================================================ */
+
+/* ── Light theme tokens (default) ─────────────────────────────── */
 .adobestore-product-detail {
+  --s2-bg: #fff;
+  --s2-surface-raised: #f8f8f8;
+  --s2-text-heading: #131313;
+  --s2-text-body: #292929;
+  --s2-text-subdued: #505050;
+  --s2-text-muted: #8a8a8a;
+  --s2-border: #e9e9e9;
+  --s2-border-subtle: #f0f0f0;
+  --s2-chip-bg: #f8f8f8;
+  --s2-chip-border: #e0e0e0;
+  --s2-chip-text: #505050;
+  --s2-cta-color: #1473e6;
+  --s2-cta-hover-bg: #1473e6;
+  --s2-cta-hover-fg: #fff;
+  --s2-thumb-active-border: #1473e6;
+  --s2-transition: 0.2s ease;
+
   width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 20px 24px;
   box-sizing: border-box;
   font-family: 'Adobe Clean', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #222;
-  background: #fff;
+  color: var(--s2-text-body);
+  background: var(--s2-bg);
+  transition:
+    background-color var(--s2-transition),
+    color var(--s2-transition);
 }
 
+/* ── Dark theme tokens ────────────────────────────────────────── */
+.adobestore-product-detail[data-theme="dark"] {
+  --s2-bg: #111;
+  --s2-surface-raised: #1e1e1e;
+  --s2-text-heading: #f2f2f2;
+  --s2-text-body: #dbdbdb;
+  --s2-text-subdued: #afafaf;
+  --s2-text-muted: #8a8a8a;
+  --s2-border: #373737;
+  --s2-border-subtle: #2c2c2c;
+  --s2-chip-bg: #282828;
+  --s2-chip-border: #444;
+  --s2-chip-text: #afafaf;
+  --s2-cta-color: #4b9aff;
+  --s2-cta-hover-bg: #4b9aff;
+  --s2-cta-hover-fg: #fff;
+  --s2-thumb-active-border: #4b9aff;
+}
+
+/* ── Layout ───────────────────────────────────────────────────── */
 .adobestore-detail {
   display: flex;
   gap: 32px;
@@ -16,6 +65,7 @@
   margin: 0 auto;
 }
 
+/* ── Image section ────────────────────────────────────────────── */
 .adobestore-detail-image-section {
   flex: 0 0 300px;
   display: flex;
@@ -29,10 +79,11 @@
   height: auto;
   max-height: 320px;
   object-fit: contain;
-  background: #f8f8f8;
+  background: var(--s2-surface-raised);
   border-radius: 12px;
   padding: 16px;
   box-sizing: border-box;
+  transition: background-color var(--s2-transition);
 }
 
 .adobestore-detail-thumbs {
@@ -46,14 +97,17 @@
   width: 56px;
   height: 56px;
   object-fit: contain;
-  background: #f8f8f8;
+  background: var(--s2-surface-raised);
   border-radius: 8px;
   padding: 4px;
   box-sizing: border-box;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: border-color 0.15s ease, opacity 0.15s ease;
   opacity: 0.6;
+  transition:
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    background-color var(--s2-transition);
 }
 
 .adobestore-detail-thumb:hover {
@@ -61,10 +115,11 @@
 }
 
 .adobestore-detail-thumb.active {
-  border-color: #eb1000;
+  border-color: var(--s2-thumb-active-border);
   opacity: 1;
 }
 
+/* ── Info section ─────────────────────────────────────────────── */
 .adobestore-detail-info {
   flex: 1;
   display: flex;
@@ -75,33 +130,38 @@
 .adobestore-detail-sku {
   font-size: 11px;
   font-weight: 500;
-  color: #aaa;
+  color: var(--s2-text-muted);
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  transition: color var(--s2-transition);
 }
 
 .adobestore-detail-title {
   font-size: 24px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--s2-text-heading);
   margin: 2px 0 0;
   line-height: 1.2;
+  transition: color var(--s2-transition);
 }
 
 .adobestore-detail-price {
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--s2-text-heading);
   margin: 4px 0;
+  transition: color var(--s2-transition);
 }
 
 .adobestore-detail-short-desc {
   font-size: 14px;
-  color: #555;
+  color: var(--s2-text-subdued);
   line-height: 1.6;
   margin: 0;
+  transition: color var(--s2-transition);
 }
 
+/* ── Options ──────────────────────────────────────────────────── */
 .adobestore-detail-options {
   display: flex;
   flex-direction: column;
@@ -120,7 +180,8 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #888;
+  color: var(--s2-text-muted);
+  transition: color var(--s2-transition);
 }
 
 .adobestore-detail-opt-values {
@@ -132,26 +193,35 @@
 .adobestore-detail-opt-chip {
   font-size: 12px;
   padding: 4px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--s2-chip-border);
   border-radius: 16px;
-  color: #333;
-  background: #fafafa;
+  color: var(--s2-chip-text);
+  background: var(--s2-chip-bg);
   white-space: nowrap;
+  transition:
+    background-color var(--s2-transition),
+    border-color var(--s2-transition),
+    color var(--s2-transition);
 }
 
+/* ── Divider ──────────────────────────────────────────────────── */
 .adobestore-detail-divider {
   border: none;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--s2-border);
   margin: 6px 0;
+  transition: border-color var(--s2-transition);
 }
 
+/* ── Description ──────────────────────────────────────────────── */
 .adobestore-detail-desc {
   font-size: 13px;
-  color: #666;
+  color: var(--s2-text-subdued);
   line-height: 1.7;
   margin: 0;
+  transition: color var(--s2-transition);
 }
 
+/* ── CTA button ───────────────────────────────────────────────── */
 .adobestore-detail-buy {
   display: inline-flex;
   align-items: center;
@@ -161,41 +231,46 @@
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  color: #eb1000;
+  color: var(--s2-cta-color);
   background: none;
-  border: 1.5px solid #eb1000;
+  border: 1.5px solid var(--s2-cta-color);
   border-radius: 20px;
   padding: 9px 24px;
   cursor: pointer;
   text-decoration: none;
   text-align: center;
-  transition: all 0.2s ease;
+  transition:
+    background var(--s2-transition),
+    color var(--s2-transition),
+    border-color var(--s2-transition);
 }
 
 .adobestore-detail-buy:hover {
-  background: #eb1000;
-  color: #fff;
+  background: var(--s2-cta-hover-bg);
+  color: var(--s2-cta-hover-fg);
 }
 
 .adobestore-detail-buy:focus,
 .adobestore-detail-buy:active,
 .adobestore-detail-buy:visited {
-  color: #eb1000;
+  color: var(--s2-cta-color);
   outline: none;
 }
 
 .adobestore-detail-buy:hover:focus,
 .adobestore-detail-buy:hover:active {
-  color: #fff;
+  color: var(--s2-cta-hover-fg);
 }
 
+/* ── Empty state ──────────────────────────────────────────────── */
 .adobestore-detail-empty {
   text-align: center;
   padding: 40px;
-  color: #999;
+  color: var(--s2-text-muted);
   font-size: 14px;
 }
 
+/* ── Responsive ───────────────────────────────────────────────── */
 @media (width <= 768px) {
   .adobestore-product-detail {
     padding: 16px;

@@ -1,4 +1,35 @@
+/* ================================================================
+   adobestore-products — Spectrum 2 theme-aware product carousel
+   ================================================================
+   Design tokens derived from Spectrum 2 color aliases:
+     Light: gray-25 → gray-900, accent rgb(59,99,251)
+     Dark:  gray-25 → gray-900 (inverted), accent rgb(64,105,253)
+   ================================================================ */
+
+/* ── Light theme tokens (default) ─────────────────────────────── */
 .adobestore-products {
+  --s2-surface: #fff;
+  --s2-surface-raised: #f8f8f8;
+  --s2-text-heading: #131313;
+  --s2-text-body: #292929;
+  --s2-text-subdued: #505050;
+  --s2-text-muted: #8f8f8f;
+  --s2-border: #e9e9e9;
+  --s2-border-hover: #d5d5d5;
+  --s2-accent: #1473e6;
+  --s2-accent-hover: #0d66d0;
+  --s2-accent-fg: #fff;
+  --s2-accent-outline-hover-bg: transparent;
+  --s2-accent-outline-hover-fg: #1473e6;
+  --s2-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --s2-shadow-card-hover: 0 12px 28px rgba(0, 0, 0, 0.1);
+  --s2-arrow-bg: #fff;
+  --s2-arrow-border: #e0e0e0;
+  --s2-arrow-fg: #505050;
+  --s2-arrow-hover-bg: #f8f8f8;
+  --s2-arrow-hover-border: #d5d5d5;
+  --s2-transition: 0.2s ease;
+
   width: 100%;
   max-width: 100%;
   margin: 0;
@@ -7,19 +38,47 @@
   overflow: visible;
   box-sizing: border-box;
   font-family: 'Adobe Clean', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #222;
+  color: var(--s2-text-body);
+  transition: color var(--s2-transition);
 }
 
+/* ── Dark theme tokens ────────────────────────────────────────── */
+.adobestore-products[data-theme="dark"] {
+  --s2-surface: #1e1e1e;
+  --s2-surface-raised: #282828;
+  --s2-text-heading: #f2f2f2;
+  --s2-text-body: #dbdbdb;
+  --s2-text-subdued: #afafaf;
+  --s2-text-muted: #8a8a8a;
+  --s2-border: #373737;
+  --s2-border-hover: #505050;
+  --s2-accent: #4b9aff;
+  --s2-accent-hover: #3d8cf0;
+  --s2-accent-fg: #fff;
+  --s2-accent-outline-hover-bg: transparent;
+  --s2-accent-outline-hover-fg: #6bb3ff;
+  --s2-shadow-card: 0 1px 4px rgba(0, 0, 0, 0.28);
+  --s2-shadow-card-hover: 0 12px 28px rgba(0, 0, 0, 0.4);
+  --s2-arrow-bg: #2c2c2c;
+  --s2-arrow-border: #444;
+  --s2-arrow-fg: #dbdbdb;
+  --s2-arrow-hover-bg: #373737;
+  --s2-arrow-hover-border: #555;
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
 .adobestore-header {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #999;
+  color: var(--s2-text-muted);
   margin-bottom: 10px;
   padding-left: 2px;
+  transition: color var(--s2-transition);
 }
 
+/* ── Carousel container ───────────────────────────────────────── */
 .adobestore-container {
   display: flex;
   gap: 16px;
@@ -35,10 +94,10 @@
   display: none;
 }
 
+/* ── Card ─────────────────────────────────────────────────────── */
 .adobestore-card {
-  background: #fff;
+  background: var(--s2-surface);
   border-radius: 14px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
   min-width: 230px;
@@ -46,23 +105,31 @@
   flex-shrink: 0;
   box-sizing: border-box;
   overflow: hidden;
-  border: 1px solid #ebebeb;
+  border: 1px solid var(--s2-border);
+  box-shadow: var(--s2-shadow-card);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color var(--s2-transition),
+    border-color var(--s2-transition);
 }
 
 .adobestore-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 10%);
+  box-shadow: var(--s2-shadow-card-hover);
 }
 
+/* ── Card image ───────────────────────────────────────────────── */
 .adobestore-card-image {
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  background: #f5f5f5;
+  background: var(--s2-surface-raised);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: background-color var(--s2-transition);
 }
 
 .adobestore-card-image img {
@@ -78,6 +145,7 @@
   transform: scale(1.05);
 }
 
+/* ── Card body ────────────────────────────────────────────────── */
 .adobestore-card-body {
   padding: 14px 16px 16px;
   display: flex;
@@ -89,23 +157,26 @@
 .adobestore-card-title {
   font-size: 14px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--s2-text-heading);
   margin: 0;
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  transition: color var(--s2-transition);
 }
 
 .adobestore-card-price {
   font-size: 16px;
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--s2-text-heading);
   margin: 2px 0 0;
   letter-spacing: -0.3px;
+  transition: color var(--s2-transition);
 }
 
+/* ── Card action buttons ──────────────────────────────────────── */
 .adobestore-card-actions {
   display: flex;
   gap: 8px;
@@ -125,44 +196,49 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, color 0.15s ease;
   line-height: 1;
   box-sizing: border-box;
-  background: #1473e6;
-  color: #fff;
-  border: 1.5px solid #1473e6;
+  background: var(--s2-accent);
+  color: var(--s2-accent-fg);
+  border: 1.5px solid var(--s2-accent);
   outline: none;
+  transition:
+    background var(--s2-transition),
+    color var(--s2-transition),
+    border-color var(--s2-transition);
 }
 
 .adobestore-btn:hover,
 .adobestore-btn:focus:hover,
 .adobestore-btn:active:hover {
-  background: #fff;
-  color: #1473e6;
+  background: var(--s2-accent-outline-hover-bg);
+  color: var(--s2-accent-outline-hover-fg);
+  border-color: var(--s2-accent);
 }
 
 .adobestore-btn:focus,
 .adobestore-btn:focus-visible,
 .adobestore-btn:active {
-  background: #1473e6;
-  color: #fff;
-  border-color: #1473e6;
+  background: var(--s2-accent);
+  color: var(--s2-accent-fg);
+  border-color: var(--s2-accent);
 }
 
+/* ── Empty state ──────────────────────────────────────────────── */
 .adobestore-empty {
   text-align: center;
   padding: 40px;
-  color: #999;
+  color: var(--s2-text-muted);
   font-size: 14px;
 }
 
-/* Carousel arrows */
+/* ── Carousel arrows ──────────────────────────────────────────── */
 .adobestore-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: var(--s2-arrow-bg);
+  border: 1px solid var(--s2-arrow-border);
   border-radius: 50%;
   width: 36px;
   height: 36px;
@@ -173,20 +249,24 @@
   justify-content: center;
   cursor: pointer;
   z-index: 100;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
-  transition: all 0.2s ease;
+  box-shadow: var(--s2-shadow-card);
   padding: 0;
   flex-shrink: 0;
   font-size: 20px;
   font-weight: 300;
   line-height: 1;
-  color: #333;
+  color: var(--s2-arrow-fg);
+  transition:
+    background var(--s2-transition),
+    border-color var(--s2-transition),
+    color var(--s2-transition),
+    box-shadow var(--s2-transition);
 }
 
 .adobestore-arrow:hover {
-  background: #fafafa;
-  border-color: #ccc;
-  box-shadow: 0 3px 12px rgb(0 0 0 / 12%);
+  background: var(--s2-arrow-hover-bg);
+  border-color: var(--s2-arrow-hover-border);
+  box-shadow: var(--s2-shadow-card-hover);
 }
 
 .adobestore-arrow.disabled {
@@ -203,6 +283,7 @@
   right: 6px;
 }
 
+/* ── Responsive ───────────────────────────────────────────────── */
 @media (width <= 768px) {
   .adobestore-products {
     padding: 10px 32px;

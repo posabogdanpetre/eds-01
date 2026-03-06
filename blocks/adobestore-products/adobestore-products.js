@@ -1,5 +1,9 @@
 const ARROW_SVG = '<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 1.5L8 6l-4.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
+function applyTheme(block, theme) {
+  block.dataset.theme = (theme === 'dark') ? 'dark' : 'light';
+}
+
 function createProductCard(product, bridge) {
   const card = document.createElement('div');
   card.className = 'adobestore-card';
@@ -133,6 +137,11 @@ export default async function decorate(block, bridge) {
 
     block.appendChild(container);
     createCarouselArrows(container, block);
+
+    applyTheme(block, bridge.hostContext?.theme);
+    bridge.onContextChange((ctx) => {
+      if (ctx.theme) applyTheme(block, ctx.theme);
+    });
   } catch (error) {
     block.textContent = 'Error loading products';
     // eslint-disable-next-line no-console

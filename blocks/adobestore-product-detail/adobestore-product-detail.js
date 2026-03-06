@@ -1,3 +1,7 @@
+function applyTheme(block, theme) {
+  block.dataset.theme = (theme === 'dark') ? 'dark' : 'light';
+}
+
 function createDetailView(product, bridge) {
   const container = document.createElement('div');
   container.className = 'adobestore-detail';
@@ -37,7 +41,6 @@ function createDetailView(product, bridge) {
   }
   container.appendChild(imageSection);
 
-  // Info section
   const info = document.createElement('div');
   info.className = 'adobestore-detail-info';
 
@@ -63,7 +66,6 @@ function createDetailView(product, bridge) {
     info.appendChild(shortDesc);
   }
 
-  // Options (sizes, colors)
   if (product.options && product.options.length > 0) {
     const optionsContainer = document.createElement('div');
     optionsContainer.className = 'adobestore-detail-options';
@@ -143,6 +145,11 @@ export default async function decorate(block, bridge) {
 
     const detailView = createDetailView(data.product, bridge);
     block.appendChild(detailView);
+
+    applyTheme(block, bridge.hostContext?.theme);
+    bridge.onContextChange((ctx) => {
+      if (ctx.theme) applyTheme(block, ctx.theme);
+    });
   } catch (error) {
     block.textContent = 'Error loading product details';
     // eslint-disable-next-line no-console
