@@ -200,9 +200,6 @@
   justify-content: center;
   line-height: 1;
   box-sizing: border-box;
-  background: var(--s2-accent);
-  color: var(--s2-accent-fg);
-  border: 1.5px solid var(--s2-accent);
   outline: none;
   transition:
     background var(--s2-transition),
@@ -210,20 +207,60 @@
     border-color var(--s2-transition);
 }
 
-.adobestore-btn:hover,
-.adobestore-btn:focus:hover,
-.adobestore-btn:active:hover {
-  background: var(--s2-accent-outline-hover-bg);
-  color: var(--s2-accent-outline-hover-fg);
-  border-color: var(--s2-accent);
+/* Secondary (outline) — "More Details" */
+.adobestore-btn-details {
+  background: transparent;
+  color: var(--s2-accent);
+  border: 1.5px solid var(--s2-border-hover);
 }
 
-.adobestore-btn:focus,
-.adobestore-btn:focus-visible,
-.adobestore-btn:active {
+.adobestore-btn-details:hover {
   background: var(--s2-accent);
   color: var(--s2-accent-fg);
   border-color: var(--s2-accent);
+}
+
+.adobestore-btn-details:focus,
+.adobestore-btn-details:focus-visible,
+.adobestore-btn-details:active {
+  background: transparent;
+  color: var(--s2-accent);
+  border-color: var(--s2-border-hover);
+}
+
+.adobestore-btn-details:focus:hover,
+.adobestore-btn-details:active:hover {
+  background: var(--s2-accent);
+  color: var(--s2-accent-fg);
+  border-color: var(--s2-accent);
+}
+
+/* Primary (accent fill) — "Buy" */
+.adobestore-btn-buy {
+  background: var(--s2-accent);
+  color: var(--s2-accent-fg);
+  border: 1.5px solid var(--s2-accent);
+}
+
+.adobestore-btn-buy:hover {
+  background: var(--s2-accent-hover);
+  border-color: var(--s2-accent-hover);
+  color: var(--s2-accent-fg);
+}
+
+.adobestore-btn-buy:focus,
+.adobestore-btn-buy:focus-visible,
+.adobestore-btn-buy:active {
+  background: var(--s2-accent);
+  color: var(--s2-accent-fg);
+  border-color: var(--s2-accent);
+}
+
+.adobestore-btn-buy:focus:hover,
+.adobestore-btn-buy:active:hover {
+  background: var(--s2-accent-hover);
+  border-color: var(--s2-accent-hover);
+  color: var(--s2-accent-fg);
 }
 
 /* ── Empty state ──────────────────────────────────────────────── */
