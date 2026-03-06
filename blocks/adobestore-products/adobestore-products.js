@@ -38,7 +38,7 @@ function createProductCard(product, bridge) {
   detailsBtn.textContent = 'More Details';
   detailsBtn.addEventListener('click', () => {
     if (bridge) {
-      bridge.sendMessage(`Show me details for Adobe Store product ${product.sku}`);
+      bridge.sendMessage(`Product details for SKU ${product.sku}`);
     }
   });
 
