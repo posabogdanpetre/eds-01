@@ -65,6 +65,10 @@ function createDetailView(coffee) {
   return container;
 }
 
+function applyTheme(block, theme) {
+  block.dataset.theme = (theme === 'dark') ? 'dark' : 'light';
+}
+
 export default async function decorate(block, bridge) {
   block.textContent = 'Loading coffee details...';
   block.className = 'frescopa-coffee-details';
@@ -73,6 +77,9 @@ export default async function decorate(block, bridge) {
     block.innerHTML = '<p style="padding:16px;color:#888;">This block requires tool data from an LLM Apps host.</p>';
     return;
   }
+
+  applyTheme(block, bridge.hostContext?.theme);
+  bridge.onContextChange((ctx) => { if (ctx.theme) applyTheme(block, ctx.theme); });
 
   try {
     const result = await bridge.toolResult;

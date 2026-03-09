@@ -84,6 +84,10 @@ function createCarouselArrows(container, block) {
   block.appendChild(rightArrow);
 }
 
+function applyTheme(block, theme) {
+  block.dataset.theme = (theme === 'dark') ? 'dark' : 'light';
+}
+
 export default async function decorate(block, bridge) {
   block.textContent = 'Loading Frescopa coffees...';
   block.className = 'frescopa-coffee-list';
@@ -92,6 +96,9 @@ export default async function decorate(block, bridge) {
     block.innerHTML = '<p class="no-coffee">This block requires tool data from an LLM Apps host.</p>';
     return;
   }
+
+  applyTheme(block, bridge.hostContext?.theme);
+  bridge.onContextChange((ctx) => { if (ctx.theme) applyTheme(block, ctx.theme); });
 
   try {
     const result = await bridge.toolResult;

@@ -1,18 +1,61 @@
+/* ================================================================
+   frescopa-coffee-list — Theme-aware coffee carousel
+   ================================================================
+   Warm coffee palette with light/dark support via data-theme
+   ================================================================ */
+
 .frescopa-coffee-list {
+  --fc-bg: transparent;
+  --fc-surface: #fff;
+  --fc-surface-warm: #faf8f5;
+  --fc-text-heading: #4a3728;
+  --fc-text-body: #5c4a3d;
+  --fc-text-muted: #8b7a6b;
+  --fc-text-price: #6b1f1f;
+  --fc-border: #d4c5b5;
+  --fc-accent: #6b1f1f;
+  --fc-accent-hover: #4a1515;
+  --fc-accent-fg: #fff;
+  --fc-arrow-bg: #fff;
+  --fc-arrow-border: #d4c5b5;
+  --fc-arrow-shadow: 0 2px 12px rgba(74, 55, 40, 0.2);
+  --fc-transition: 0.2s ease;
+
   width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 20px 50px;
   position: relative;
-  overflow: visible;
+  overflow-x: hidden;
+  overflow-y: visible;
   box-sizing: border-box;
   font-family: Georgia, "Times New Roman", serif;
+  background: var(--fc-bg);
+  transition: color var(--fc-transition);
 }
 
+.frescopa-coffee-list[data-theme="dark"] {
+  --fc-surface: #1e1a16;
+  --fc-surface-warm: #251f18;
+  --fc-text-heading: #f2ece4;
+  --fc-text-body: #d4c8b4;
+  --fc-text-muted: #8c7f6c;
+  --fc-text-price: #e8a87c;
+  --fc-border: #3d3426;
+  --fc-accent: #c49a6c;
+  --fc-accent-hover: #d4ab7c;
+  --fc-accent-fg: #1a1207;
+  --fc-arrow-bg: #251f18;
+  --fc-arrow-border: #3d3426;
+  --fc-arrow-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Container ────────────────────────────────────────────────── */
 .coffee-container {
   display: flex;
   gap: 24px;
-  overflow: auto visible;
+  overflow-x: auto;
+  overflow-y: hidden;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -24,12 +67,13 @@
   display: none;
 }
 
+/* ── Card ─────────────────────────────────────────────────────── */
 .coffee-card {
   position: relative;
-  background: #fff;
-  border-radius: 0;
+  background: var(--fc-surface);
+  border-radius: 12px;
   padding: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform var(--fc-transition), box-shadow var(--fc-transition), background-color var(--fc-transition);
   display: flex;
   flex-direction: column;
   min-width: 300px;
@@ -37,20 +81,28 @@
   flex-shrink: 0;
   box-sizing: border-box;
   overflow: hidden;
+  border: 1px solid var(--fc-border);
 }
 
 .coffee-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(74, 55, 40, 0.12);
 }
 
+.frescopa-coffee-list[data-theme="dark"] .coffee-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Card image ───────────────────────────────────────────────── */
 .coffee-card-image {
   width: 100%;
   height: 320px;
   overflow: hidden;
-  background: #faf8f5;
+  background: var(--fc-surface-warm);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color var(--fc-transition);
 }
 
 .coffee-card-image img {
@@ -66,8 +118,9 @@
   transform: scale(1.05);
 }
 
+/* ── Card body ────────────────────────────────────────────────── */
 .coffee-card-body {
-  padding: 16px 8px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -80,69 +133,74 @@
   font-size: 20px;
   font-weight: 400;
   font-style: italic;
-  color: #4a3728;
+  color: var(--fc-text-heading);
   margin: 0;
   line-height: 1.3;
+  transition: color var(--fc-transition);
 }
 
 .coffee-description {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
-  color: #5c4a3d;
+  color: var(--fc-text-body);
   margin: 0;
   line-height: 1.5;
   flex-grow: 1;
+  transition: color var(--fc-transition);
 }
 
 .coffee-price {
   font-family: Georgia, "Times New Roman", serif;
   font-size: 18px;
   font-weight: 700;
-  color: #6b1f1f;
+  color: var(--fc-text-price);
   margin: 8px 0 0;
+  transition: color var(--fc-transition);
 }
 
+/* ── Button ───────────────────────────────────────────────────── */
 .coffee-details-btn {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-  background: #6b1f1f;
-  border: none;
-  border-radius: 6px;
+  font-weight: 600;
+  color: var(--fc-accent-fg);
+  background: var(--fc-accent);
+  border: 2px solid var(--fc-accent);
+  border-radius: 980px;
   padding: 10px 16px;
   margin-top: auto;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all var(--fc-transition);
 }
 
 .coffee-details-btn:hover {
-  background: #4a1515;
+  background: transparent;
+  color: var(--fc-accent);
 }
 
 .coffee-details-btn:focus,
-.coffee-details-btn:active,
-.coffee-details-btn:visited {
-  color: #fff;
-  background: #6b1f1f;
+.coffee-details-btn:active {
+  color: var(--fc-accent-fg);
+  background: var(--fc-accent);
   outline: none;
 }
 
+/* ── Empty state ──────────────────────────────────────────────── */
 .no-coffee {
   text-align: center;
   padding: 40px;
-  color: #5c4a3d;
+  color: var(--fc-text-muted);
   font-size: 16px;
   font-family: Georgia, "Times New Roman", serif;
 }
 
-/* Carousel arrows */
+/* ── Carousel arrows ──────────────────────────────────────────── */
 .carousel-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: #fff;
-  border: 2px solid #d4c5b5;
+  background: var(--fc-arrow-bg);
+  border: 2px solid var(--fc-arrow-border);
   border-radius: 50%;
   width: 44px;
   height: 44px;
@@ -153,21 +211,20 @@
   justify-content: center;
   cursor: pointer;
   z-index: 100;
-  box-shadow: 0 2px 12px rgb(74 55 40 / 20%);
-  transition: all 0.3s ease;
+  box-shadow: var(--fc-arrow-shadow);
+  transition: all var(--fc-transition);
   padding: 0;
   flex-shrink: 0;
   font-size: 28px;
   font-weight: 300;
   line-height: 1;
-  color: #4a3728;
+  color: var(--fc-text-heading);
 }
 
 .carousel-arrow:hover {
-  background: #faf8f5;
-  border-color: #6b1f1f;
-  color: #6b1f1f;
-  box-shadow: 0 4px 12px rgb(74 55 40 / 25%);
+  background: var(--fc-surface-warm);
+  border-color: var(--fc-accent);
+  color: var(--fc-accent);
 }
 
 .carousel-arrow.disabled {
@@ -176,44 +233,26 @@
   pointer-events: none;
 }
 
-.carousel-arrow-left {
-  left: 5px;
-}
+.carousel-arrow-left { left: 5px; }
+.carousel-arrow-right { right: 5px; }
 
-.carousel-arrow-right {
-  right: 5px;
-}
-
-/* Responsive design */
+/* ── Responsive ───────────────────────────────────────────────── */
 @media (width <= 768px) {
   .frescopa-coffee-list {
     padding: 12px 35px;
   }
 
-  .coffee-container {
-    gap: 16px;
-  }
+  .coffee-container { gap: 16px; }
 
   .coffee-card {
     min-width: 260px;
     max-width: 260px;
   }
 
-  .coffee-card-image {
-    height: 280px;
-  }
-
-  .coffee-card-body {
-    padding: 12px 8px;
-  }
-
-  .coffee-title {
-    font-size: 18px;
-  }
-
-  .coffee-price {
-    font-size: 16px;
-  }
+  .coffee-card-image { height: 280px; }
+  .coffee-card-body { padding: 12px 8px; }
+  .coffee-title { font-size: 18px; }
+  .coffee-price { font-size: 16px; }
 
   .carousel-arrow {
     width: 36px;
@@ -223,16 +262,8 @@
     font-size: 24px;
   }
 
-  .carousel-arrow-left {
-    left: 2px;
-  }
-
-  .carousel-arrow-right {
-    right: 2px;
-  }
+  .carousel-arrow-left { left: 2px; }
+  .carousel-arrow-right { right: 2px; }
 }
 
-/* Ensure widget background is transparent */
-aem-embed body {
-  background-color: transparent;
-}
+aem-embed body { background-color: transparent; }
