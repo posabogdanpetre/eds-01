@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "full",
+  "commit_sha": "c5713ef55d16370fcffd0d8eb39b64935929d2a7",
+  "author": "bposa@adobe.com",
+  "timestamp": "2026-03-31T15:59:06+03:00",
+  "detection": {
+    "ai_assisted": true,
+    "method": "heuristic",
+    "tool": "claude-code",
+    "model": "",
+    "confidence": 0.9
+  },
+  "stats": {
+    "total_additions": 68,
+    "total_deletions": 0,
+    "ai_additions": 68,
+    "ai_deletions": 0,
+    "human_additions": 0,
+    "human_deletions": 0
+  },
+  "files": {
+    "blocks/frescopa-coffee-list/frescopa-coffee-list.css": {
+      "ai_additions": 47,
+      "human_additions": 0,
+      "ai_deletions": 0,
+      "human_deletions": 0
+    },
+    "blocks/frescopa-coffee-list/frescopa-coffee-list.js": {
+      "ai_additions": 21,
+      "human_additions": 0,
+      "ai_deletions": 0,
+      "human_deletions": 0
+    }
+  }
+}
