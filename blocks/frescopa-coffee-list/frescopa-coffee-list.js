@@ -121,6 +121,27 @@ export default async function decorate(block, bridge) {
 
     block.appendChild(container);
     createCarouselArrows(container, block);
+
+    // Book a Tasting CTA
+    const tastingSection = document.createElement('div');
+    tastingSection.className = 'tasting-cta';
+
+    const tastingText = document.createElement('p');
+    tastingText.className = 'tasting-cta-text';
+    tastingText.textContent = 'Curious about our blends? Experience them in person.';
+
+    const tastingBtn = document.createElement('button');
+    tastingBtn.className = 'tasting-cta-btn';
+    tastingBtn.textContent = 'Book a Tasting';
+    tastingBtn.addEventListener('click', () => {
+      if (bridge) {
+        bridge.sendMessage('I would like to book a tasting session');
+      }
+    });
+
+    tastingSection.appendChild(tastingText);
+    tastingSection.appendChild(tastingBtn);
+    block.appendChild(tastingSection);
   } catch (error) {
     block.textContent = 'Error loading coffees';
     // eslint-disable-next-line no-console
