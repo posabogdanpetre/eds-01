@@ -1,4 +1,4 @@
-function createDetailView(coffee) {
+function createDetailView(coffee, bridge) {
   const container = document.createElement('div');
   container.className = 'coffee-detail-container';
 
@@ -59,6 +59,17 @@ function createDetailView(coffee) {
     infoSection.appendChild(fullDesc);
   }
 
+  // Book a Tasting CTA
+  const tastingBtn = document.createElement('button');
+  tastingBtn.className = 'coffee-detail-tasting-btn';
+  tastingBtn.textContent = 'Book a Tasting';
+  tastingBtn.addEventListener('click', () => {
+    if (bridge) {
+      bridge.sendMessage('I would like to book a tasting session');
+    }
+  });
+  infoSection.appendChild(tastingBtn);
+
   container.appendChild(imageSection);
   container.appendChild(infoSection);
 
@@ -92,7 +103,7 @@ export default async function decorate(block, bridge) {
       return;
     }
 
-    const detailView = createDetailView(data.coffee);
+    const detailView = createDetailView(data.coffee, bridge);
     block.appendChild(detailView);
   } catch (error) {
     block.textContent = 'Error loading coffee details';

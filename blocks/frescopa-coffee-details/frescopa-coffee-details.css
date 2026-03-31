@@ -16,6 +16,9 @@
   --fd-border: #e8e0d8;
   --fd-badge-bg: #f5f0eb;
   --fd-badge-text: #6b5344;
+  --fd-accent: #6b1f1f;
+  --fd-accent-hover: #4a1515;
+  --fd-accent-fg: #fff;
   --fd-transition: 0.2s ease;
 
   width: 100%;
@@ -40,6 +43,9 @@
   --fd-border: #3d3426;
   --fd-badge-bg: #2c2418;
   --fd-badge-text: #c49a6c;
+  --fd-accent: #c49a6c;
+  --fd-accent-hover: #d4ab7c;
+  --fd-accent-fg: #1a1207;
 }
 
 /* ── Layout ───────────────────────────────────────────────────── */
@@ -144,6 +150,34 @@
   line-height: 1.7;
   margin: 0;
   transition: color var(--fd-transition);
+}
+
+/* ── Tasting CTA ─────────────────────────────────────────────── */
+.coffee-detail-tasting-btn {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fd-accent);
+  background: transparent;
+  border: 2px solid var(--fd-accent);
+  border-radius: 980px;
+  padding: 12px 32px;
+  margin-top: 8px;
+  width: fit-content;
+  cursor: pointer;
+  transition: all var(--fd-transition);
+}
+
+.coffee-detail-tasting-btn:hover {
+  background: var(--fd-accent);
+  color: var(--fd-accent-fg);
+}
+
+.coffee-detail-tasting-btn:focus,
+.coffee-detail-tasting-btn:active {
+  background: var(--fd-accent);
+  color: var(--fd-accent-fg);
+  outline: none;
 }
 
 /* ── Empty ────────────────────────────────────────────────────── */
