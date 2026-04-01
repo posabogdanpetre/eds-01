@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "full",
+  "commit_sha": "0026a43c6e567c71a0eb9b6e053b6e77856cc7b1",
+  "author": "bposa@adobe.com",
+  "timestamp": "2026-04-01T14:45:21+03:00",
+  "detection": {
+    "ai_assisted": true,
+    "method": "editor_hook",
+    "tool": "cursor",
+    "model": "",
+    "confidence": 1.0
+  },
+  "stats": {
+    "total_additions": 1,
+    "total_deletions": 0,
+    "ai_additions": 1,
+    "ai_deletions": 0,
+    "human_additions": 0,
+    "human_deletions": 0
+  },
+  "files": {
+    "blocks/frescopa-tasting/frescopa-tasting.js": {
+      "ai_additions": 1,
+      "human_additions": 0,
+      "ai_deletions": 0,
+      "human_deletions": 0,
+      "ai_lines": "176",
+      "human_lines": ""
+    }
+  }
+}
