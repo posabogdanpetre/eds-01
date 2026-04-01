@@ -173,7 +173,7 @@ function createStep1(data, onNext) {
 
   const subtitle = document.createElement('p');
   subtitle.className = 'ft-subtitle';
-  subtitle.textContent = `Cafés near ${data.zipcode}`;
+  subtitle.textContent = 'Find your nearest Frescopa café and book a tasting session.';
 
   const cafeSelector = createCafeSelector(data.cafes, () => {});
   const menu = createTastingMenu(data.tastingMenu);
