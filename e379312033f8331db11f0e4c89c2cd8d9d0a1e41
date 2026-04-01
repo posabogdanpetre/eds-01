@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "full",
+  "commit_sha": "e379312033f8331db11f0e4c89c2cd8d9d0a1e41",
+  "author": "bposa@adobe.com",
+  "timestamp": "2026-04-01T15:46:27+03:00",
+  "detection": {
+    "ai_assisted": true,
+    "method": "editor_hook",
+    "tool": "cursor",
+    "model": "",
+    "confidence": 1.0
+  },
+  "stats": {
+    "total_additions": 36,
+    "total_deletions": 0,
+    "ai_additions": 36,
+    "ai_deletions": 0,
+    "human_additions": 0,
+    "human_deletions": 0
+  },
+  "files": {
+    "blocks/hello-world/hello-world.css": {
+      "ai_additions": 20,
+      "human_additions": 0,
+      "ai_deletions": 0,
+      "human_deletions": 0,
+      "ai_lines": "2-8,10-22",
+      "human_lines": ""
+    },
+    "blocks/hello-world/hello-world.js": {
+      "ai_additions": 16,
+      "human_additions": 0,
+      "ai_deletions": 0,
+      "human_deletions": 0,
+      "ai_lines": "1-2,4,6-18",
+      "human_lines": ""
+    }
+  }
+}
