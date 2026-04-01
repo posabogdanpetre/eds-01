@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "full",
+  "commit_sha": "105e6573da723029bffe2f88bd5371ccee676114",
+  "author": "bposa@adobe.com",
+  "timestamp": "2026-04-01T15:55:37+03:00",
+  "detection": {
+    "ai_assisted": true,
+    "method": "editor_hook",
+    "tool": "codex",
+    "model": "",
+    "confidence": 1.0
+  },
+  "stats": {
+    "total_additions": 2,
+    "total_deletions": 0,
+    "ai_additions": 2,
+    "ai_deletions": 0,
+    "human_additions": 0,
+    "human_deletions": 0
+  },
+  "files": {
+    "blocks/hello-world/hello-world.js": {
+      "ai_additions": 2,
+      "human_additions": 0,
+      "ai_deletions": 0,
+      "human_deletions": 0,
+      "ai_lines": "11,15",
+      "human_lines": ""
+    }
+  }
+}
