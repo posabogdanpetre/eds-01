@@ -8,11 +8,11 @@ export default function decorate(block) {
 
   const heading = document.createElement('h2');
   heading.className = 'hello-world-heading';
-  heading.textContent = `Test block for ${name}`;
+  heading.textContent = `Sample message for ${name}`;
 
   const text = document.createElement('p');
   text.className = 'hello-world-text';
-  text.textContent = 'This content was updated as part of a quick validation pass.';
+  text.textContent = 'This is placeholder text for the hello-world test block.';
 
   wrapper.append(heading, text);
   block.append(wrapper);
