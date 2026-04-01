@@ -1,3 +1,22 @@
 .hello-world {
-  padding: 20px;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.hello-world .hello-world-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem;
+}
+
+.hello-world .hello-world-text {
+  font-size: 1rem;
+  color: #555;
+  margin: 0;
 }
